@@ -8,4 +8,5 @@ services:
       - OPEN_WHEATER_KEY=${OPEN_WHEATER_KEY}
       - YOUTUBE_USER=${YOUTUBE_USER}
       - YOUTUBE_KEY=${YOUTUBE_KEY}
+      - NODE_ENV=${NODE_ENV}
     restart: always
