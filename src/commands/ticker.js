@@ -28,7 +28,7 @@ const handler = {
 };
 
 function getTickerMessage(tickInfo, horaAtualizacao) {
-    return `*${ticker.toUperCase()}*: *R$ ${tickInfo.c}* (${tickInfo.cp})
+    return `*${ticker.toUpperCase()}*: *R$ ${tickInfo.c}* (${tickInfo.cp})
 
 Mínima: R$ ${tickInfo.l}
 Máxima: R$ ${tickInfo.h}
