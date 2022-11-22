@@ -28,12 +28,10 @@ const handler = {
 };
 
 function getTickerMessage(tickInfo, horaAtualizacao) {
-    return `*${ticker}* (${tickInfo.cp})
+    return `*${ticker}* - *R$ ${tickInfo.c}* (${tickInfo.cp})
 
 Minima: R$ ${tickInfo.l}
 Máxima: R$ ${tickInfo.h}
-Atual : R$ ${tickInfo.c}
-
 
 *Última atualização às ${horaAtualizacao}...*`;
 }
