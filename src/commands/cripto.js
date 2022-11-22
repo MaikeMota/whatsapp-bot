@@ -30,11 +30,9 @@ const handler = {
         const horaAtualizacao = lastUpdateDate.toLocaleTimeString()
 
         msg.reply(`*${ticker}* (${tickInfo.cp})
-
+Atual : ${getSymbolFor(pair2)} ${tickInfo.c}
 Minima: ${getSymbolFor(pair2)} ${tickInfo.l}
 Máxima: ${getSymbolFor(pair2)} ${tickInfo.h}
-Atual : ${getSymbolFor(pair2)} ${tickInfo.c}
-
 
 *Última atualização às ${horaAtualizacao}...*`)
 
