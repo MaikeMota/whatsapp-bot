@@ -1,0 +1,41 @@
+const { getStockInfo } = require("../services/fcs-api.service");
+
+
+const handler = {
+    command: '/ticker',
+    alternativeCommands: ['/cotação'],
+    usage: '/ticker tickerDaEmpresa',
+    isValidParams: (argsArray) => {
+        const [args] = argsArray;
+        const [ticker] = args.split(' ');
+        return !!ticker;
+    },
+    handle: async (argsArray, msg, chat) => {
+        const [args] = argsArray;
+        ticker = args.toLowerCase();
+        tickInfo = await getStockInfo(ticker);
+
+        if (!tickInfo) {
+            msg.reply(`Não consegui encontrar informações sobre o preço de ${ticker}`);
+            return;
+        }
+        const lastUpdateDate = new Date(tickInfo.t * 1000);
+        const horaAtualizacao = lastUpdateDate.toLocaleTimeString();
+
+        msg.reply(getTickerMessage(tickInfo, horaAtualizacao));
+
+    }
+};
+
+function getTickerMessage(tickInfo, horaAtualizacao) {
+    return `*${ticker}* (${tickInfo.cp})
+
+Minima: R$ ${tickInfo.l}
+Máxima: R$ ${tickInfo.h}
+Atual : R$ ${tickInfo.c}
+
+
+*Última atualização às ${horaAtualizacao}...*`;
+}
+
+module.exports = { handler }
