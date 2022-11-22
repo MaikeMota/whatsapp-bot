@@ -16,11 +16,11 @@ const handler = {
 */vda inscritos*
 */vidacionista inscritos*
     _Exibe a contagem de escritos no canal Vida de Acionista._`,
-    isValidParams: (argsArray) => {
+    isValidParams: (_, argsArray) => {
         const [firstArg] = argsArray;
         return AVAILABLE_SUBCOMMANDS.includes(firstArg);
     },
-    handle: async (argsArray, msg, chat) => {
+    handle: async (_, chat, msg, argsArray) => {
 
         const [firstArg] = argsArray;
         if (VIDEO_SUBCOMMANDS.includes(firstArg)) {

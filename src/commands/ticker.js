@@ -5,12 +5,12 @@ const handler = {
     command: '/ticker',
     alternativeCommands: ['/cotação'],
     usage: '/ticker tickerDaEmpresa',
-    isValidParams: (argsArray) => {
+    isValidParams: (_, argsArray) => {
         const [args] = argsArray;
         const [ticker] = args.split(' ');
         return !!ticker;
     },
-    handle: async (argsArray, msg, chat) => {
+    handle: async (_, __, msg, argsArray) => {
         const [args] = argsArray;
         ticker = args.toLowerCase();
         tickInfo = await getStockInfo(ticker);

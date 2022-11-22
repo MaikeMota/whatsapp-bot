@@ -6,15 +6,14 @@ const handler = {
     usage: `/cripto symbol\n
 /cripto symbol/currency\n
 /cripto eth/usd`,
-    isValidParams: (argsArray) => {
+    isValidParams: (_, argsArray) => {
         const [args] = argsArray;
         const [symbol] = args.split('/');
         return !!symbol;
     },
-    handle: async (argsArray, msg, chat) => {
+    handle: async (_, __, msg, argsArray) => {
         const [args] = argsArray;
-        const [symbol] = args.split('/');
-        let [pair1, pair2] = symbol.split('/');
+        let [pair1, pair2] = args.split('/');
         if (!pair2) {
             pair2 = 'brl'
         }

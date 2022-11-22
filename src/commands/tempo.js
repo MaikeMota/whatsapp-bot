@@ -6,10 +6,10 @@ const handler = {
     usage: `*/tempo nome da sua cidade*
     _Retorna dados sobre o tempo na cidade digitada_
 `,
-    isValidParams: (argsArray) => {
+    isValidParams: (_, argsArray) => {
         return argsArray.length > 0
     },
-    handle: async (argsArray, msg, chat) => {
+    handle: async (client, _, msg, argsArray) => {
         cidade = '';
         if (argsArray.length > 1) {
             cidade = argsArray.join(' ');

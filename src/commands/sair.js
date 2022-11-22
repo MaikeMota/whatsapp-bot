@@ -7,7 +7,7 @@ const handler = {
     isValidParams: (_) => {
         return true;
     },
-    handle: async (argsArray, msg, chat) => {
+    handle: async (_, __, msg, ___) => {
         await msg.reply(`para sair envie um pix de R$${randomIntFromInterval(5, 50)} para 43999867608`);
     }
 };

@@ -1,5 +1,7 @@
 require('dotenv').config()
 
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
 const qrcode = require('qrcode-terminal');
 
 const { Client, } = require('whatsapp-web.js');
@@ -9,6 +11,9 @@ const { handler: criptoHandler } = require('./src/commands/cripto')
 const { handler: sairHandler } = require('./src/commands/sair')
 const { handler: vdaHandler } = require('./src/commands/vda')
 const { handler: tempoHandler } = require('./src/commands/tempo')
+const { handler: getIdHandler } = require('./src/commands/getId')
+const { handler: allHandler } = require('./src/commands/all')
+const { handler: admsHandler } = require('./src/commands/adms')
 
 
 
@@ -39,10 +44,14 @@ let Handlers = [
     criptoHandler,
     sairHandler,
     vdaHandler,
-    tempoHandler
+    tempoHandler,
+    getIdHandler,
+    allHandler,
+    admsHandler
 ]
 
 registerCommand = (command, handler, handlers) => {
+    command = IS_PRODUCTION ? command : `dev-${command}`
     if (handlers[command]) {
         console.error(`Já existe um handler para o comando ${command}`)
     } else {
@@ -84,10 +93,10 @@ const handleMessage = async (msg) => {
         const handler = Handlers[command]
         if (handler) {
             console.info(`Message contains a registered command ${command}`);
-            if (handler.isValidParams(argsArray)) {
+            if (handler.isValidParams(chat, argsArray)) {
                 try {
                     console.info(`Calling handler for ${command}`);
-                    await handler.handle(argsArray, msg, chat);
+                    await handler.handle(client, chat, msg, argsArray);
                 } catch (e) {
                     console.error(`Erro ao processar comando ${command}`)
                     console.error(e);
@@ -98,68 +107,7 @@ const handleMessage = async (msg) => {
         }
     }
 
-
-    //if (typeof msg.body === "string" && msg.body.startsWith("/tempo")) {
-    //             let [_, ...args] = msg.body.split(' ');
-    //             if (args && args.length > 1) {
-    //                 cidade = args.join(' ');
-    //             } else {
-    //                 cidade = args[0];
-    //             }
-    //             if (!cidade) {
-    //                 cidade = 'londrina';
-    //             }
-
-    //             const wheaterInfo = await getWheater(cidade);
-
-    //             if (wheaterInfo) {
-
-    //                 const { temp, temp_min, temp_max, feels_like, humidity } = wheaterInfo;
-
-
-    //                 msg.reply(`Agora em ${cidade} fazem ${temp} ºC 
-    // Umidade relativa do ar em ${humidity}%
-
-    // Minima:             ${temp_min} ºC
-    // Máxima:             ${temp_max} ºC
-    // Sensação Térmica :  ${feels_like} ºC`)
-    //             } else {
-    //                 msg.reply(`Não consegui encontrar detalhes do tempo para a cidade ${cidade}, tente digitar o nome completo, sem abreviações.`);
-    //             }
-
-    //         } else  if (msg.body === "/getId") {
-    //             msg.reply(chat.id._serialized)
-
-    //         } else if (msg.body === "@adm") {
-    //             if (chat.isGroup) {
-    //                 let text = "";
-    //                 let mentions = [];
-
-    //                 for (let participant of chat.participants) {
-    //                     const contact = await client.getContactById(participant.id._serialized);
-    //                     if (participant.isAdmin || participant.isSuperAdmin) {
-    //                         mentions.push(contact);
-    //                         text += ` @${participant.id.user}`;
-    //                     }
-    //                 }
-
-    //                 await chat.sendMessage(text, { mentions });
-    //             }
-
-    //         } else if (msg.body === "@all") {
-    //             if (chat.isGroup) {
-    //                 let text = "";
-    //                 let mentions = [];
-
-    //                 for (let participant of chat.participants) {
-    //                     const contact = await client.getContactById(participant.id._serialized);
-    //                     mentions.push(contact);
-    //                     text += ` @${participant.id.user}`;
-    //                 }
-
-    //                 await chat.sendMessage(text, { mentions });
-    //             }
-    //         } else if (msg.body == '!danibot') {
+    //   if (msg.body == '!danibot') {
     //             msg.reply(`[DaniBot] says: ${lerolero()}`).catch(console.log);
     //         } else {
     //             if (chat.name.includes('Knife') || chat.name.includes('NEUROSE')) {
