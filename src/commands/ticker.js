@@ -22,12 +22,12 @@ const handler = {
         const lastUpdateDate = new Date(tickInfo.t * 1000);
         const horaAtualizacao = lastUpdateDate.toLocaleTimeString();
 
-        msg.reply(getTickerMessage(tickInfo, horaAtualizacao));
+        msg.reply(getTickerMessage(ticker, tickInfo, horaAtualizacao));
 
     }
 };
 
-function getTickerMessage(tickInfo, horaAtualizacao) {
+function getTickerMessage(ticker, tickInfo, horaAtualizacao) {
     return `*${ticker.toUpperCase()}*: *R$ ${tickInfo.c}* (${tickInfo.cp})
 
 Mínima: R$ ${tickInfo.l}

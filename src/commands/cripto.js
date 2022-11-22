@@ -28,15 +28,19 @@ const handler = {
 
         const lastUpdateDate = new Date(tickInfo.t * 1000)
         const horaAtualizacao = lastUpdateDate.toLocaleTimeString()
-
-        msg.reply(`*${ticker.toUpperCase()}*: *${getSymbolFor(pair2)} ${tickInfo.c}* (${tickInfo.cp})
-
-Mínima: ${getSymbolFor(pair2)} ${tickInfo.l}
-Máxima: ${getSymbolFor(pair2)} ${tickInfo.h}
-
-*Última atualização às ${horaAtualizacao}...*`)
+        const symbol = getSymbolFor(pair2)
+        msg.reply(getMessageForUser(ticker, symbol, tickInfo, horaAtualizacao))
 
     }
 };
 
 module.exports = { handler }
+
+function getMessageForUser(ticker, symbol, tickInfo, horaAtualizacao) {
+    return `*${ticker.toUpperCase()}*: *${symbol} ${tickInfo.c}* (${tickInfo.cp})
+
+Mínima: ${symbol} ${tickInfo.l}
+Máxima: ${symbol} ${tickInfo.h}
+
+*Última atualização às ${horaAtualizacao}...*`;
+}
