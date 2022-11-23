@@ -9,4 +9,5 @@ services:
       - YOUTUBE_USER=${YOUTUBE_USER}
       - YOUTUBE_KEY=${YOUTUBE_KEY}
       - NODE_ENV=${NODE_ENV}
+      - TZ=${TZ}
     restart: always
