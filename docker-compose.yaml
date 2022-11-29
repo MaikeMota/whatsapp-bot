@@ -2,6 +2,7 @@ version: "3"
 services:
   whatsapp_bot:
     build: .
+    pull_policy: build
     environment:
       - FCS_API_KEY=${FCS_API_KEY}
       - FCS_API_KEY_2=${FCS_API_KEY_2}
@@ -11,3 +12,4 @@ services:
       - NODE_ENV=${NODE_ENV}
       - TZ=${TZ}
     restart: always
+    
