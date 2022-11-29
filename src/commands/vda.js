@@ -57,9 +57,7 @@ async function handleVideoCommand(chat) {
 }
 
 async function handlePromotionalLinks(msg) {
-    await msg.reply(`
-
-🐊 Assine a plataforma AGF+ com 30% de desconto: https://bit.ly/3nJHQUl
+    await msg.reply(`🐊 Assine a plataforma AGF+ com 30% de desconto: https://bit.ly/3nJHQUl
 
 Considere comprar um dos livros recomendados pelos links abaixo:
 
