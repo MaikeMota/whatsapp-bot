@@ -14,6 +14,7 @@ const { handler: tempoHandler } = require('./src/commands/tempo')
 const { handler: getIdHandler } = require('./src/commands/getId')
 const { handler: allHandler } = require('./src/commands/all')
 const { handler: admsHandler } = require('./src/commands/adms')
+const { handler: daniHandler } = require('./src/commands/danibot')
 
 
 
@@ -47,7 +48,8 @@ let Handlers = [
     tempoHandler,
     getIdHandler,
     allHandler,
-    admsHandler
+    admsHandler,
+    daniHandler
 ]
 
 registerCommand = (command, handler, handlers) => {
@@ -107,10 +109,7 @@ const handleMessage = async (msg) => {
         }
     }
 
-    //   if (msg.body == '!danibot') {
-    //             msg.reply(`[DaniBot] says: ${lerolero()}`).catch(console.log);
-    //         } else {
-    //             if (chat.name.includes('Knife') || chat.name.includes('NEUROSE')) {
+    //   if (chat.name.includes('Knife') || chat.name.includes('NEUROSE')) {
     //                 if (new Date().getTime() % 13 === 0) {
     //                     chat.sendMessage(chat.id, `[DaniBot] says: ${lerolero()}`).catch(console.log);
     //                 } else if (new Date().getTime() % 17 === 0) {
@@ -153,5 +152,3 @@ const frasesBruno = ["ah velho, pára mano"]
 client.on('message_create', handleMessage);
 
 client.initialize();
-
-
