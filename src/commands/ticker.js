@@ -11,24 +11,45 @@ const handler = {
         return !!ticker;
     },
     handle: async (_, __, msg, argsArray) => {
-        const [args] = argsArray;
-        ticker = args.toLowerCase();
-        tickInfo = await getStockInfo(ticker);
 
-        if (!tickInfo) {
-            msg.reply(`Não consegui encontrar informações sobre o preço de ${ticker}`);
-            return;
+        const isMultiple = argsArray.length > 1
+
+        if (isMultiple) {
+
+            const results = await getStockInfo(argsArray);
+
+            let tickersMessage = ""
+            for (const result of results) {
+                tickersMessage += getOneLineTickerMessage(result) + "\n"
+            }
+
+            msg.reply(`${tickersMessage}`)
+
+        } else {
+            const [args] = argsArray;
+
+            ticker = args.toLowerCase();
+            const ticksInfo = await getStockInfo(ticker);
+            const tickInfo = ticksInfo[0];
+            if (!tickInfo) {
+                msg.reply(`Não consegui encontrar informações sobre o preço de ${ticker}`);
+                return;
+            }
+            const lastUpdateDate = new Date(tickInfo.t * 1000);
+            const horaAtualizacao = lastUpdateDate.toLocaleTimeString();
+
+            msg.reply(getTickerMessage(tickInfo, horaAtualizacao));
         }
-        const lastUpdateDate = new Date(tickInfo.t * 1000);
-        const horaAtualizacao = lastUpdateDate.toLocaleTimeString();
-
-        msg.reply(getTickerMessage(ticker, tickInfo, horaAtualizacao));
 
     }
 };
 
-function getTickerMessage(ticker, tickInfo, horaAtualizacao) {
-    return `*${ticker.toUpperCase()}*: *R$ ${tickInfo.c}* (${tickInfo.cp})
+function getOneLineTickerMessage(tickInfo) {
+    return `*${tickInfo.ticker.toUpperCase()}*: *R$ ${tickInfo.c}* (${tickInfo.cp})`
+}
+
+function getTickerMessage(tickInfo, horaAtualizacao) {
+    return `*${tickInfo.ticker.toUpperCase()}*: *R$ ${tickInfo.c}* (${tickInfo.cp})
 
 Mínima: R$ ${tickInfo.l}
 Máxima: R$ ${tickInfo.h}
