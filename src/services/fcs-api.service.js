@@ -1,4 +1,4 @@
-const FCS_API_KEY = process.env.FCS_API_KEY;
+const FCS_API_KEY = process.env.FCS_API_KEY_2;
 
 const DataTypeEnum = {
     STOCK: 'stock',
@@ -8,30 +8,52 @@ const DataTypeEnum = {
 const stocksCache = {};
 const criptoCache = {}
 
-async function retrieveData(ticker, dataType) {
-    const result = await fetch(`https://fcsapi.com/api-v3/${dataType}/latest?symbol=${ticker}&access_key=${FCS_API_KEY}`).then(r => r.json());
+async function retrieveData(dataType, ...tickers) {
+    const searchValue = tickers.join(',')
+    const apiResult = await fetch(`https://fcsapi.com/api-v3/${dataType}/latest?symbol=${searchValue}&access_key=${FCS_API_KEY}`).then(r => r.json());
 
-    if (result.code === 200) {
-        const { c, h, l, t, cp } = result.response[0];
-        return {
-            c, h, l, t: parseInt(t), cp
-        };
+    if (apiResult.code !== 200) {
+        throw new Error("API Retornou diferente de 200.\n" + apiResult.code);
     }
+    const returnValues = [];
+    for (const result of apiResult.response) {
+        const { c, h, l, t, cp, s } = result;
+        returnValues.push({
+            ticker: s, c, h, l, t: parseInt(t), cp
+        })
+    }
+
+    return returnValues;
+
 }
 
-async function getStockInfo(ticker) {
-    let tickInfo = stocksCache[ticker];
-    if (tickInfo) {
-        const { t } = tickInfo;
-        if (hasCacheTimeExpired(t)) {
-            tickInfo = await retrieveData(ticker, DataTypeEnum.STOCK);
+async function getStockInfo(tickers) {
+    const tickersInfo = [];
+
+    const tickersToRetrieve = [];
+
+    for (const ticker of tickers) {
+        let tickInfo = stocksCache[ticker];
+        if (tickInfo) {
+            const { t } = tickInfo;
+            if (hasCacheTimeExpired(t)) {
+                tickersToRetrieve.push(ticker);
+            } else {
+                tickersInfo.push(tickInfo)
+            }
+        } else {
+            tickersToRetrieve.push(ticker);
         }
-    } else {
-        tickInfo = await retrieveData(ticker, DataTypeEnum.STOCK);
     }
 
-    stocksCache[ticker] = tickInfo;
-    return tickInfo
+    if (tickersToRetrieve.length) {
+        const results = await retrieveData(DataTypeEnum.STOCK, tickersToRetrieve);
+        for (const result of results) {
+            stocksCache[result.ticker] = result;
+            tickersInfo.push(result)
+        }
+    }
+    return tickersInfo.sort((a, b) => { if (a.ticker > b.ticker) return 1; if (b.ticker > a.ticker) return -1; return 0; })
 }
 
 async function getCriptoInfo(ticker) {
@@ -39,10 +61,10 @@ async function getCriptoInfo(ticker) {
     if (tickInfo) {
         const { t } = tickInfo;
         if (hasCacheTimeExpired(t)) {
-            tickInfo = await retrieveData(ticker, DataTypeEnum.CRYPTO)
+            tickInfo = await retrieveData(DataTypeEnum.CRYPTO, ticker)
         }
     } else {
-        tickInfo = await retrieveData(ticker, DataTypeEnum.CRYPTO)
+        tickInfo = await retrieveData(DataTypeEnum.CRYPTO, ticker)
     }
     criptoCache[ticker] = tickInfo;
     return tickInfo
