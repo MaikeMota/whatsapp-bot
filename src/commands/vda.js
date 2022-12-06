@@ -29,7 +29,6 @@ const handler = {
         return AVAILABLE_SUBCOMMANDS.includes(firstArg);
     },
     handle: async (_, chat, msg, argsArray) => {
-
         const [firstArg] = argsArray;
         if (VIDEO_SUBCOMMANDS.includes(firstArg)) {
             await handleVideoCommand(chat);
@@ -41,6 +40,8 @@ const handler = {
 
     }
 };
+
+
 
 module.exports = { handler }
 
