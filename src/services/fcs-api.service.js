@@ -1,4 +1,4 @@
-const FCS_API_KEY = process.env.FCS_API_KEY_2;
+const FCS_API_KEY = process.env.FCS_API_KEY;
 
 const DataTypeEnum = {
     STOCK: 'stock',
