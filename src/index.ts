@@ -1,27 +1,26 @@
-require('dotenv').config()
+import { config as dotEnvConfig } from 'dotenv'
+
+dotEnvConfig();
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+const DUMP_MESSAGE = process.env.DUMP_MESSAGE === 'true';
 
-const qrcode = require('qrcode-terminal');
+import * as  qrcode from 'qrcode-terminal';
 
-const { Client, } = require('whatsapp-web.js');
+import { Client, LocalAuth } from 'whatsapp-web.js';
 
-const { handler: tickerHandler } = require('./src/commands/ticker')
-const { handler: criptoHandler } = require('./src/commands/cripto')
-const { handler: sairHandler } = require('./src/commands/sair')
-const { handler: vdaHandler } = require('./src/commands/vda')
-const { handler: tempoHandler } = require('./src/commands/tempo')
-const { handler: getIdHandler } = require('./src/commands/getId')
-const { handler: allHandler } = require('./src/commands/all')
-const { handler: admsHandler } = require('./src/commands/adms')
-const { handler: daniHandler } = require('./src/commands/danibot')
-
-
-
-
-DUMP_MESSAGE = false;
+import { handler as tickerHandler } from './commands/ticker.js'
+import { handler as criptoHandler } from './commands/cripto.js'
+import { handler as sairHandler } from './commands/sair.js'
+import { handler as vdaHandler } from './commands/vda.js'
+import { handler as tempoHandler } from './commands/tempo.js'
+import { handler as getIdHandler } from './commands/getId.js'
+import { handler as allHandler } from './commands/all.js'
+import { handler as admsHandler } from './commands/adms.js'
+import { handler as daniHandler } from './commands/danibot.js'
 
 const client = new Client({
+    authStrategy: new LocalAuth(),
     puppeteer: {
         args: ['--no-sandbox'],
     }
@@ -33,10 +32,10 @@ client.on('qr', (qr) => {
     qrcode.generate(qr, { small: true });
 });
 
-client.on('ready', async () => {
+client.on('authenticated', async () => {
     console.log('Client is ready!');
-    console.log("WhatsApp Web v", await client.getWWebVersion());
-    console.log("WWebJS v", require("whatsapp-web.js").version);
+    console.log(`WhatsApp Web v${await client.getWWebVersion()}`);
+    console.log(`WWebJS v${require('whatsapp-web.js').version}`,);
 });
 
 
@@ -52,8 +51,8 @@ let Handlers = [
     daniHandler
 ]
 
-registerCommand = (command, handler, handlers) => {
-    command = IS_PRODUCTION ? command : `dev-${command}`
+const registerCommand = (command, handler, handlers) => {
+    command = IS_PRODUCTION ? command : `${command}-dev`
     if (handlers[command]) {
         console.error(`Já existe um handler para o comando ${command}`)
     } else {
