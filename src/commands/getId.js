@@ -9,7 +9,9 @@ const handler = {
         return true;
     },
     handle: async (_, chat, msg, __) => {
-        await msg.reply(chat.id._serialized);
+        if (msg.fromMe) {
+            await msg.reply(chat.id._serialized);
+        }
     }
 };
 
