@@ -1,3 +1,8 @@
+const INTERVAL_BETWEEN_USES = 1 * 60 * 1000
+
+const lastUses = {}
+const lastWarnings = {}
+
 const handler = {
     command: '@all',
     alternativeCommands: [],
@@ -8,16 +13,35 @@ const handler = {
     isValidParams: (chat, _) => {
         return chat.isGroup;
     },
-    handle: async (client, chat, _, __,) => {
-        let text = "";
-        let mentions = [];
+    handle: async (client, chat, msg, __,) => {
 
-        for (let participant of chat.participants) {
-            const contact = await client.getContactById(participant.id._serialized);
-            mentions.push(contact);
-            text += ` @${participant.id.user}`;
+
+        const key = `${chat.id}-${msg.author}`
+        const lastUse = lastUses[key];
+        const now = Date.now();
+        
+        if (lastUse && (now - lastUse) < INTERVAL_BETWEEN_USES) {
+
+            const lastWarning = lastWarnings[key];
+            if (lastWarning && (now - lastWarning) < INTERVAL_BETWEEN_USES) {
+                return;
+            }
+            await msg.reply("Você não pode marcar todo mundo com tanta frequência!")
+            lastWarnings[key] = now;
+
+        } else {
+            let text = "";
+            let mentions = [];
+
+            for (let participant of chat.participants) {
+                const contact = await client.getContactById(participant.id._serialized);
+                mentions.push(contact);
+                text += ` @${participant.id.user}`;
+            }
+            await chat.sendMessage(text, { mentions });
+            lastUses[key] = now;
+
         }
-        await chat.sendMessage(text, { mentions });
     }
 };
 
