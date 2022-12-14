@@ -1,7 +1,7 @@
 import { Chat, Client, GroupChat, Message } from "whatsapp-web.js";
 import { Command } from "./command.interface";
 
-const ALL_COMMAND_INTERVAL_IN_MINUTES = parseInt(process.env.ALL_COMMAND_INTERVAL_IN_MINUTES)
+const ALL_COMMAND_INTERVAL_IN_MINUTES = parseInt((process.env.ALL_COMMAND_INTERVAL_IN_MINUTES || `5`))
 
 const INTERVAL_BETWEEN_USES = ALL_COMMAND_INTERVAL_IN_MINUTES * 60 * 1000
 
