@@ -13,6 +13,10 @@ services:
       - TZ=${TZ}
       - DEEPGRAM_APY=${DEEPGRAM_APY}
       - ALL_COMMAND_INTERVAL_IN_MINUTES=${ALL_COMMAND_INTERVAL_IN_MINUTES}
+    volumes:
+      - type: bind
+        source: ${AUTH_FOLDER}
+        target: /app/.wwebjs_auth
     restart: always
 
     
