@@ -70,12 +70,9 @@ async function getCriptoInfo(ticker) {
     return tickInfo
 }
 
-
-
 function hasCacheTimeExpired(cachedTime) {
     return (new Date().getTime() / 1000) > (cachedTime + (60 * 60));
 }
-
 
 function getSymbolFor(name) {
     switch (name) {

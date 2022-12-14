@@ -11,12 +11,11 @@ COPY . .
 
 RUN npm i
 RUN node ./node_modules/puppeteer/install.js
+RUN npm run build
 
 
 from builder
 
 WORKDIR /app/
-
-COPY --from=builder . .
 
 CMD ["npm", "start"]

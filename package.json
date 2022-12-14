@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "start": "rm -rf dist/ && tsc --project . && node dist/index.js",
+    "build": "tsc --project .",
+    "start": "node dist/index.js",
     "dev": "nodemon .",
     "debug": "nodemon --inspect",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -14,10 +14,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@deepgram/sdk": "^1.14.0",
     "dotenv": "^16.0.3",
     "lerolero": "^0.1.0",
     "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.18.3"
+    "whatsapp-web.js": "^1.18.4"
   },
   "devDependencies": {
     "@types/node": "^18.11.11",

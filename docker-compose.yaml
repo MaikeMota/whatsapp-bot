@@ -11,5 +11,8 @@ services:
       - YOUTUBE_KEY=${YOUTUBE_KEY}
       - NODE_ENV=${NODE_ENV}
       - TZ=${TZ}
+      - DEEPGRAM_APY=${DEEPGRAM_APY}
+      - ALL_COMMAND_INTERVAL_IN_MINUTES=${ALL_COMMAND_INTERVAL_IN_MINUTES}
     restart: always
+
     

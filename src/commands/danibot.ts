@@ -1,15 +1,20 @@
+import { Chat, Client, Message } from "whatsapp-web.js";
+import { Command } from "./command.interface";
+
 const { randomIntFromInterval } = require('../utils/util');
 const lerolero = require('lerolero');
 
-
-const handler = {
-    command: '/danibot',
-    alternativeCommands: ['!danibot', '/botdani', '!botdani', '/dani', '!dani'],
-    usage: '',
-    isValidParams: (chat, argsArray) => {
-        return chat.name.includes('Knife') || chat.name.includes('NEUROSE')
-    },
-    handle: async (client, chat, msg, argsArray) => {
+export class DaniBotCommand implements Command {
+    command= '/danibot';
+    alternativeCommands= ['!danibot', '/botdani', '!botdani', '/dani', '!dani'];
+    usage= '';
+    async isValid(chat: Chat, ...argsArray: string[]): Promise<boolean> {
+        return true
+    }
+    async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
+        if(!chat.name.includes('Knife') && !chat.name.includes('NEUROSE')){
+            return
+        }
         const rn = randomIntFromInterval(1, 6);
         const useClassic = rn === 2 || rn === 4;
         let message = "[DaniBot] says: ";
@@ -20,9 +25,7 @@ const handler = {
         }
         await msg.reply(`[DaniBot] says: ${lerolero()}`)
     }
-};
-
-module.exports = { handler }
+}
 
 
 const CLASSICAS_DANI = [

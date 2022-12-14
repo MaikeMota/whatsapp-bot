@@ -1,14 +1,17 @@
-const handler = {
-    command: '@admin',
-    alternativeCommands: [],
-    usage: `
+import { Chat, Client, GroupChat, Message } from "whatsapp-web.js";
+import { Command } from "./command.interface";
+
+export class MentionAllAdminsCommand implements Command {
+    command = '@admin';
+    alternativeCommands = [];
+    usage = `
 */admin*
- _Marca os admins do grupo_
-`,
-    isValidParams: (chat, _) => {
+ _Marca os admins do grupo_`
+    async isValid(chat: Chat, ...argsArray: string[]): Promise<boolean> {
         return chat.isGroup;
-    },
-    handle: async (client, chat, _, __) => {
+
+    }
+    async handle(client: Client, chat: GroupChat, msg: Message, ...argsArray: string[]): Promise<void> {
         let text = "";
         let mentions = [];
 
@@ -22,6 +25,5 @@ const handler = {
 
         await chat.sendMessage(text, { mentions });
     }
-};
 
-module.exports = { handler }
+}
