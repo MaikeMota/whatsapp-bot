@@ -9,15 +9,17 @@ import * as  qrcode from 'qrcode-terminal';
 
 import { Client, LocalAuth } from 'whatsapp-web.js';
 
-import { handler as tickerHandler } from './commands/ticker.js'
-import { handler as criptoHandler } from './commands/cripto.js'
-import { handler as sairHandler } from './commands/sair.js'
-import { handler as vdaHandler } from './commands/vda.js'
-import { handler as tempoHandler } from './commands/tempo.js'
-import { handler as getIdHandler } from './commands/getId.js'
-import { handler as allHandler } from './commands/all.js'
-import { handler as admsHandler } from './commands/adms.js'
-import { handler as daniHandler } from './commands/danibot.js'
+import { SairCommand } from './commands/sair';
+import { TranscreverCommand } from './commands/transcrever';
+import { MentionAllCommand } from './commands/all';
+import { MentionAllAdminsCommand } from './commands/adms';
+import { CriptoCommand } from './commands/cripto';
+import { DaniBotCommand } from './commands/danibot';
+import { GetIdCommand } from './commands/getId';
+import { TempoCommand } from './commands/tempo';
+import { TickerCommand } from './commands/ticker';
+import { VDACommand } from './commands/vda';
+import { Command } from './commands/command.interface';
 
 const client = new Client({
     authStrategy: new LocalAuth(),
@@ -39,19 +41,20 @@ client.on('authenticated', async () => {
 });
 
 
-let Handlers = [
-    tickerHandler,
-    criptoHandler,
-    sairHandler,
-    vdaHandler,
-    tempoHandler,
-    getIdHandler,
-    allHandler,
-    admsHandler,
-    daniHandler
+const handlers: Command[] = [
+    new TickerCommand(),
+    new CriptoCommand(),
+    new SairCommand(),
+    new VDACommand(),
+    new TempoCommand(),
+    new GetIdCommand(),
+    new MentionAllCommand(),
+    new MentionAllAdminsCommand(),
+    new DaniBotCommand(),
+    new TranscreverCommand()
 ]
 
-const registerCommand = (command, handler, handlers) => {
+const registerCommand = (command: string, handler: Command, handlers) => {
     command = IS_PRODUCTION ? command : `${command}-dev`
     if (handlers[command]) {
         console.error(`Já existe um handler para o comando ${command}`)
@@ -61,22 +64,19 @@ const registerCommand = (command, handler, handlers) => {
     }
 }
 
-Handlers = Handlers.reduce((prev, handler, idx) => {
-
-    registerCommand(handler.command, handler, prev);
+const RegisteredHandlers: { [key: string]: Command } = {}
+handlers.forEach((handler) => {
+    registerCommand(handler.command, handler, RegisteredHandlers);
     for (const command of handler.alternativeCommands) {
-        registerCommand(command, handler, prev);
+        registerCommand(command, handler, RegisteredHandlers);
     }
-
-    return prev;
-}, {})
-
+});
 
 
 
 console.info(`
 Available commands:\n
-${Object.keys(Handlers).join("\n")}`)
+${Object.keys(RegisteredHandlers).join("\n")}`)
 
 const handleMessage = async (msg) => {
 
@@ -91,13 +91,13 @@ const handleMessage = async (msg) => {
     if (typeof msg.body === 'string') {
 
         const [command, ...argsArray] = msg.body.split(" ");
-        const handler = Handlers[command]
+        const handler = RegisteredHandlers[command]
         if (handler) {
             console.info(`Message contains a registered command ${command}`);
-            if (handler.isValidParams(chat, argsArray)) {
+            if (await handler.isValid(chat, ...argsArray)) {
                 try {
                     console.info(`Calling handler for ${command}`);
-                    await handler.handle(client, chat, msg, argsArray);
+                    await handler.handle(client, chat, msg, ...argsArray);
                 } catch (e) {
                     console.error(`Erro ao processar comando ${command}`)
                     console.error(e);
