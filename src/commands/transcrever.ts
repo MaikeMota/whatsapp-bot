@@ -18,8 +18,11 @@ export class TranscreverCommand implements Command {
         return true;
     }
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
-        if (msg.fromMe && !msg.hasQuotedMsg) {
+        if (!msg.fromMe) {
             return
+        }
+        if(!msg.hasQuotedMsg) { 
+            return;
         }
         const originalMessage = await msg.getQuotedMessage();
         if (!['ptt', 'audio'].includes(originalMessage.type.toString())) {
