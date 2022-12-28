@@ -10,7 +10,7 @@ const criptoCache = {}
 
 async function retrieveData(dataType, ...tickers) {
     const searchValue = tickers.join(',')
-    const apiResult = await fetch(`https://fcsapi.com/api-v3/${dataType}/latest?symbol=${searchValue}&access_key=${FCS_API_KEY}`).then(r => r.json());
+    const apiResult = await fetch(`https://fcsapi.com/api-v3/${dataType}/latest?symbol=${searchValue}&exchange=BM&FBovespa&access_key=${FCS_API_KEY}`).then(r => r.json());
 
     if (apiResult.code !== 200) {
         throw new Error("API Retornou diferente de 200.\n" + apiResult.code);
