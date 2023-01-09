@@ -8,7 +8,7 @@ export class TickerCommand implements Command {
     command = '/ticker';
     alternativeCommands = ['/cotação'];
     usage = '/ticker tickerDaEmpresa';
-    async isValid(chat: Chat, ...argsArray: string[]): Promise<boolean> {
+    async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
         const [args] = argsArray;
         const [ticker] = args.split(' ');
         return !!ticker;

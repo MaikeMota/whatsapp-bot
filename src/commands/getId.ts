@@ -7,7 +7,7 @@ export class GetIdCommand implements Command {
     usage = `
 */getId*
  _Retorna o ID do grupo_`;
-    async isValid(chat: Chat, ...argsArray: string[]): Promise<boolean> {
+    async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
         return true;
     }
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {

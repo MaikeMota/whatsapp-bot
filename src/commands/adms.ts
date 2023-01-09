@@ -7,7 +7,7 @@ export class MentionAllAdminsCommand implements Command {
     usage = `
 */admin*
  _Marca os admins do grupo_`
-    async isValid(chat: Chat, ...argsArray: string[]): Promise<boolean> {
+    async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
         return chat.isGroup;
 
     }

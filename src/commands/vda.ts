@@ -27,7 +27,7 @@ export class VDACommand implements Command {
 */vidacionista merchs*
     _Exibe os links de afiliado do canal._
 `;
-    async isValid(chat: Chat, ...argsArray: string[]): Promise<boolean> {
+    async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
         const [firstArg] = argsArray;
         return AVAILABLE_SUBCOMMANDS.includes(firstArg);
     }

@@ -4,6 +4,6 @@ export interface Command {
     command: string;
     alternativeCommands: string[];
     usage: string;
-    isValid: (chat: Chat, ...argsArray: string[]) => Promise<boolean>
+    isValid: (chat: Chat, msg: Message, ...argsArray: string[]) => Promise<boolean>
     handle: (client: Client, chat: Chat, msg: Message, ...argsArray: string[]) => Promise<void>
 }

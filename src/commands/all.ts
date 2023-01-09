@@ -15,7 +15,7 @@ export class MentionAllCommand implements Command {
 *@all*
  _Marca todos os integrantes do grupo_
 `
-    async isValid(chat: Chat, ...argsArray: string[]): Promise<boolean> {
+    async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
         return chat.isGroup;
     }
     async handle(client: Client, chat: GroupChat, msg: Message, ...argsArray: string[]): Promise<void> {

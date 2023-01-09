@@ -9,7 +9,7 @@ export class CriptoCommand implements Command {
     usage = `/cripto symbol\n
 /cripto symbol/currency\n
 /cripto eth/usd`;
-    async isValid(chat: Chat, ...argsArray: string[]): Promise<boolean> {
+    async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
         const [args] = argsArray;
         const [symbol] = args.split('/');
         return !!symbol;

@@ -8,7 +8,7 @@ export class TempoCommand implements Command {
     alternativeCommands = [];
     usage = `*/tempo nome da sua cidade
     _Retorna dados sobre o tempo na cidade digitada_`;
-    async isValid(chat: Chat, ...argsArray: string[]): Promise<boolean> {
+    async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
         return argsArray.length > 0
     }
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {

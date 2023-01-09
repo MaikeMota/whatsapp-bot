@@ -8,7 +8,7 @@ export class SairCommand implements Command {
     alternativeCommands: string[] = ['/exit', '/stop', '/quit', '/parar']
     usage: string;
 
-    async isValid(chat: Chat, ...argsArray: string[]): Promise<boolean> {
+    async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
         return true;
     }
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
