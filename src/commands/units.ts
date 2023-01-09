@@ -95,7 +95,10 @@ export class B3UnitsCommand implements Command {
 
         unitInfo.atualizarPrecos(unitPrice, onPrice, pnPrice);
 
-        await msg.reply(`${unitInfo.nome} (${unitNameWithSufix})
+        const whatToBuy = unitInfo.qualClasseComprar();
+        const whatToBuyTicker = getTickerBasedOnStockType(whatToBuy, tickerOn, tickerPn, unitNameWithSufix);
+
+            await msg.reply(`${unitInfo.nome} (${unitNameWithSufix})
 1 *${unitNameWithSufix}* = ${unitInfo.qtdOn} *${tickerOn}* + ${unitInfo.qtdPn} *${tickerPn}*
 
 *Cotações:*
@@ -106,7 +109,7 @@ ${tickerPn}: R$ ${unitInfo.precoPn.toString().replace('.', ',')}
 ${unitInfo.onBonifica ? 'Há' : 'Não há'} +10% em proventos nas ações PN.
 
 *Conclusão:*
-Comprar ${unitInfo.qualClasseComprar()} pode ser mais interessante no atual momento.`);
+Comprar *${whatToBuy} (${whatToBuyTicker})* pode ser mais interessante no atual momento.`);
     };
 
 }
@@ -139,6 +142,17 @@ function getB3UnitInfo(unitName: string): B3UnitInfo {
     }
 
     return new B3UnitInfo(b3Unit)
+}
+
+function getTickerBasedOnStockType(type: TipoAcao, tickerOn: string, tickerPn: string, tickerUnit: string) {
+    switch (type) {
+        case TipoAcao.ORDINARIA:
+            return tickerOn;
+        case TipoAcao.PREFERENCIAL:
+            return tickerPn;
+        case TipoAcao.UNIT:
+            return tickerUnit;
+    }
 }
 
 function normalizeUnitName(unit: string) {
