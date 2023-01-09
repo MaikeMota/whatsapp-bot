@@ -67,11 +67,13 @@ client.on('authenticated', async () => {
 
     runners.forEach(runnerConstructor => {
         const runner = new runnerConstructor();
-        console.info(`Registering runner ${runner.name} to run every ${runner.runEveryNMinutes} minut(s)`)
-        runner.run(client);
-        const interval = setInterval(() => {
-            runner.run(client)
-        }, runner.runEveryNMinutes * 60 * 1000)
+        console.info(`Registering runner ${runner.name} to run every ${runner.runEveryNMinutes} minute(s)`)
+        const catchFun = (exception) => console.error(`Error while trying to run ${runner.name}`, exception)
+        runner.run(client).catch(catchFun);
+        const interval = setInterval(async () => {
+            await runner.run(client).catch(catchFun);
+        }, runner.runEveryNMinutes * 60 * 1000);
+
         runningRunners.push({
             intervalId: interval,
             runner
