@@ -4,9 +4,11 @@ import { CounterNotifyerRunner } from "./counter-notifyer-runner";
 
 const { VDA_UPDATE_STATISTICS_EVERY_N_MINUTES, VDA_NOTIFY_EVERY_N_SUBSCRIBERS,  VDA_CHANNELS_TO_NOTIFY } = process.env;
 
-export const updateStatisticsEveryNMinuts = parseInt(VDA_UPDATE_STATISTICS_EVERY_N_MINUTES);
-export const notifyEveryNSubscribers = parseInt(VDA_NOTIFY_EVERY_N_SUBSCRIBERS);
-export const channelsToNotify = VDA_CHANNELS_TO_NOTIFY.split(',').map(c => c.trim());
+const updateStatisticsEveryNMinuts = parseInt(VDA_UPDATE_STATISTICS_EVERY_N_MINUTES);
+const notifyEveryNSubscribers = parseInt(VDA_NOTIFY_EVERY_N_SUBSCRIBERS);
+const channelsToNotify = VDA_CHANNELS_TO_NOTIFY.split(',').map(c => c.trim());
+
+
 
 export class VDASubscribersNotifyerRunner extends CounterNotifyerRunner {
 
