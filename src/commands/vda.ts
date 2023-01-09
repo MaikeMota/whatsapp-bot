@@ -1,7 +1,8 @@
 import { Chat, Client, Message } from "whatsapp-web.js";
+import { getChannelStatistics } from "../services/youtube.service";
 import { Command } from "./command.interface";
 
-const { getLatestVideo, getChannelSubs } = require('../services/youtube.service');
+const { getLatestVideo  } = require('../services/youtube.service');
 
 const VIDEO_SUBCOMMANDS = ["video", "vídeo"];
 const INSCRITOS_SUBCOMMANDS = ["inscritos"]
@@ -43,8 +44,8 @@ export class VDACommand implements Command {
     }
 
     private async handleInscritosCommand(msg) {
-        const inscritos = await getChannelSubs();
-        await msg.reply(`Atualmente temos ${inscritos} inscritos.`).catch(console.log);
+        const { subscriberCount } = await getChannelStatistics();
+        await msg.reply(`Atualmente temos ${subscriberCount} inscritos.`).catch(console.log);
     }
 
     private async handleVideoCommand(chat) {
@@ -76,4 +77,3 @@ export class VDACommand implements Command {
     }
 
 }
-
