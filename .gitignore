@@ -4,3 +4,4 @@
 .env
 /.wwebjs_auth
 /dist
+/tmp
