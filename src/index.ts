@@ -7,7 +7,9 @@ const DUMP_MESSAGE = process.env.DUMP_MESSAGE === 'true';
 
 import * as  qrcode from 'qrcode-terminal';
 
-import { Client, LocalAuth } from 'whatsapp-web.js';
+import { Client, LocalAuth, Message } from 'whatsapp-web.js';
+
+import { Constructor } from './utils/constructor';
 
 import { SairCommand } from './commands/sair';
 import { TranscreverCommand } from './commands/transcrever';
@@ -19,7 +21,12 @@ import { GetIdCommand } from './commands/getId';
 import { TempoCommand } from './commands/tempo';
 import { TickerCommand } from './commands/ticker';
 import { VDACommand } from './commands/vda';
+import { B3UnitsCommand } from './commands/units';
 import { Command } from './commands/command.interface';
+
+import { Runner } from './runners/interfaces/runner.interface';
+import { VDAViewsNotifyerRunner } from "./runners/vda/VDA-views-notifyer.runner";
+import { VDASubscribersNotifyerRunner } from "./runners/vda/VDA-subscribers-notifyer.runner";
 
 const client = new Client({
     authStrategy: new LocalAuth(),
@@ -27,6 +34,17 @@ const client = new Client({
         args: ['--no-sandbox'],
     }
 });
+
+
+client.on('auth_failure', console.log)
+client.on('loading_screen', console.log)
+
+type RunningRunner = {
+    intervalId: NodeJS.Timer;
+    runner: Runner;
+};
+
+const runningRunners: RunningRunner[] = []
 
 client.on('qr', (qr) => {
     // Generate and scan this code with your phone
@@ -37,22 +55,52 @@ client.on('qr', (qr) => {
 client.on('authenticated', async () => {
     console.log('Client is ready!');
     console.log(`WhatsApp Web v${await client.getWWebVersion()}`);
-    console.log(`WWebJS v${require('whatsapp-web.js').version}`,);
+    console.log(`WWebJS v${require('whatsapp-web.js').version}`);
+
+    handlers.forEach((handlerConstructor) => {
+        const handler = new handlerConstructor();
+        registerCommand(handler.command, handler, RegisteredHandlers);
+        for (const command of handler.alternativeCommands) {
+            registerCommand(command, handler, RegisteredHandlers);
+        }
+    });
+
+    runners.forEach(runnerConstructor => {
+        const runner = new runnerConstructor();
+        console.info(`Registering runner ${runner.name} to run every ${runner.runEveryNMinutes} minut(s)`)
+        runner.run(client);
+        const interval = setInterval(() => {
+            runner.run(client)
+        }, runner.runEveryNMinutes * 60 * 1000)
+        runningRunners.push({
+            intervalId: interval,
+            runner
+        })
+    })
+    console.info(`
+    Available commands:\n
+    ${Object.keys(RegisteredHandlers).join("\n")}`)
 });
 
 
-const handlers: Command[] = [
-    new TickerCommand(),
-    new CriptoCommand(),
-    new SairCommand(),
-    new VDACommand(),
-    new TempoCommand(),
-    new GetIdCommand(),
-    new MentionAllCommand(),
-    new MentionAllAdminsCommand(),
-    new DaniBotCommand(),
-    new TranscreverCommand()
+const handlers: Constructor<Command>[] = [
+    TickerCommand,
+    CriptoCommand,
+    SairCommand,
+    VDACommand,
+    TempoCommand,
+    GetIdCommand,
+    MentionAllCommand,
+    MentionAllAdminsCommand,
+    DaniBotCommand,
+    TranscreverCommand,
+    B3UnitsCommand
 ]
+
+const runners: Constructor<Runner>[] = [
+    VDASubscribersNotifyerRunner,
+    VDAViewsNotifyerRunner
+];
 
 const registerCommand = (command: string, handler: Command, handlers) => {
     command = IS_PRODUCTION ? command : `${command}-dev`
@@ -65,24 +113,14 @@ const registerCommand = (command: string, handler: Command, handlers) => {
 }
 
 const RegisteredHandlers: { [key: string]: Command } = {}
-handlers.forEach((handler) => {
-    registerCommand(handler.command, handler, RegisteredHandlers);
-    for (const command of handler.alternativeCommands) {
-        registerCommand(command, handler, RegisteredHandlers);
-    }
-});
 
 
 
-console.info(`
-Available commands:\n
-${Object.keys(RegisteredHandlers).join("\n")}`)
-
-const handleMessage = async (msg) => {
+const handleMessage = async (msg: Message) => {
 
     const chat = await msg.getChat();
 
-    console.info(`Received message from ${msg._data.notifyName} at ${chat.name}: `);
+    console.info(`Received message from ${msg['_data'].notifyName} at ${chat.name}: `);
 
     if (DUMP_MESSAGE) {
         console.info(JSON.stringify(msg, null, 4));
@@ -151,3 +189,19 @@ const frasesBruno = ["ah velho, pára mano"]
 client.on('message_create', handleMessage);
 
 client.initialize();
+
+
+process.on('exit ', shutdown);
+
+async function shutdown(event) {
+    console.info(`${event} signal received.`);
+    console.log('Closing runners.');
+
+    const shutdownSequences = [];
+    for (const runningRunner of runningRunners) {
+        clearInterval(runningRunner.intervalId);
+        shutdownSequences.push(runningRunner.runner.shutdown());
+    }
+    await Promise.all(shutdownSequences);
+    await client.destroy();
+}
