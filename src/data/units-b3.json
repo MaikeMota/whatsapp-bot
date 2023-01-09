@@ -1,0 +1,92 @@
+{
+    "ALUP11": {
+        "nome": "ALUPAR",
+        "qtdOn": 1,
+        "qtdPn": 2,
+        "onBonifica": false
+    },
+    "BRBI11": {
+        "nome": "BR PARTNERS",
+        "qtdOn": 1,
+        "qtdPn": 2,
+        "onBonifica": false
+    },
+    "BPAC11": {
+        "nome": "BTGP BANCO",
+        "qtdOn": 1,
+        "qtdPn": 2,
+        "onBonifica": false
+    },
+    "CPLE11": {
+        "nome": "COPEL",
+        "qtdOn": 1,
+        "qtdPn": 4,
+        "onBonifica": true
+    },
+    "ENGI11": {
+        "nome": "ENERGISA",
+        "qtdOn": 1,
+        "qtdPn": 4,
+        "onBonifica": false
+    },
+    "GETT11": {
+        "nome": "GETNET",
+        "qtdOn": 1,
+        "qtdPn": 1,
+        "onBonifica": true
+    },
+    "IGTI11": {
+        "nome": "IGUATEMI S.A",
+        "qtdOn": 1,
+        "qtdPn": 2,
+        "onBonifica": false
+    },
+    "KLBN11": {
+        "nome": "KLABIN",
+        "qtdOn": 1,
+        "qtdPn": 4,
+        "onBonifica": false
+    },
+    "MODL11": {
+        "nome": "MODALMAIS",
+        "qtdOn": 1,
+        "qtdPn": 2,
+        "onBonifica": false
+    },
+    "RNEW11": {
+        "nome": "RENOVA",
+        "qtdOn": 1,
+        "qtdPn": 2,
+        "onBonifica": false
+    },
+    "RBNS11": {
+        "nome": "RODOBENS",
+        "qtdOn": 1,
+        "qtdPn": 2,
+        "onBonifica": false
+    },
+    "SAPR11": {
+        "nome": "SANEPAR",
+        "qtdOn": 1,
+        "qtdPn": 4,
+        "onBonifica": true
+    },
+    "SANB11": {
+        "nome": "SANTANDER BR",
+        "qtdOn": 1,
+        "qtdPn": 1,
+        "onBonifica": true
+    },
+    "SULA11": {
+        "nome": "SUL AMERICA",
+        "qtdOn": 1,
+        "qtdPn": 2,
+        "onBonifica": false
+    },
+    "TAEE11": {
+        "nome": "TAESA",
+        "qtdOn": 1,
+        "qtdPn": 2,
+        "onBonifica": false
+    }
+}

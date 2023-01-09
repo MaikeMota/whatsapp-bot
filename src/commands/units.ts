@@ -1,0 +1,150 @@
+
+/**
+ * Data from: https://www.b3.com.br/pt_br/market-data-e-indices/servicos-de-dados/market-data/consultas/mercado-a-vista/units/
+ * Array.from(document.querySelectorAll('table.responsive tbody tr'))
+    .reduce((acc, line) => {
+        const [nomeColumn, tickerColumn, composicaoColumn] = line.querySelectorAll('td');
+        if(composicaoColumn.textContent.includes('BDR ')){ return acc}
+        const [on, pn] = composicaoColumn.textContent.split('+');
+        acc[tickerColumn.textContent] = {
+            nome: nomeColumn.textContent,
+            on: parseInt(on.replaceAll('[^0-9]*')),            
+            pn: parseInt(pn.replaceAll('[^0-9]*'))
+        };
+        return acc
+    }, {})
+ */
+
+
+import { Chat, Client, Message } from "whatsapp-web.js";
+import { Command } from "./command.interface";
+
+import { getStockInfo } from "../services/fcs-api.service";
+
+import unitsInfo from '../data/units-b3.json';
+
+interface B3Unit {
+    nome: string;
+    qtdOn: number;
+    qtdPn: number;
+    onBonifica: boolean;
+}
+
+class B3UnitInfo implements B3Unit {
+    nome: string;
+    qtdOn: number;
+    qtdPn: number;
+    onBonifica: boolean;
+
+    precoOn?: number;
+    precoPn?: number;
+    precoUnit?: number
+
+    constructor(b3Unit: B3Unit) {
+        const { nome, qtdOn, qtdPn, onBonifica } = b3Unit
+        this.nome = nome;
+        this.qtdOn = qtdOn;
+        this.qtdPn = qtdPn;
+        this.onBonifica = onBonifica;
+    }
+
+    qualClasseComprar(): TipoAcao {
+        if (this.precoUnit < (this.precoOn + this.precoPn)) {
+            return TipoAcao.UNIT;
+        }
+        if (this.onBonifica) {
+            const proporcao = this.precoPn / this.precoOn
+            return proporcao >= 1.1 ? TipoAcao.ORDINARIA : TipoAcao.PREFERENCIAL
+        }
+        return this.precoOn > this.precoPn ? TipoAcao.PREFERENCIAL : TipoAcao.ORDINARIA;
+    }
+
+    atualizarPrecos(unitPrice: number, onPrice: number, pnPrice: number) {
+        this.precoUnit = unitPrice;
+        this.precoOn = onPrice;
+        this.precoPn = pnPrice;
+    }
+}
+
+export class B3UnitsCommand implements Command {
+    command: string = "/unit";
+    alternativeCommands: string[] = [];
+    usage: string = "";
+    async isValid(chat: Chat, msg: Message, ...argsArray: string[]) {
+        return true;
+    }
+    async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]) {
+
+        const [unitName] = argsArray;
+
+        let unitNameWithSufix = normalizeUnitName(unitName);
+        const unitInfo: B3UnitInfo = getB3UnitInfo(unitNameWithSufix);
+
+        if (!unitInfo) {
+            await msg.reply(`Não tenho informações sobre a Unit Solicitada (${unitNameWithSufix})`);
+            return;
+        }
+
+        const tickerOn = `${unitName.replace('11', '').toUpperCase()}3`;
+        const tickerPn = `${unitName.replace('11', '').toUpperCase()}4`;
+
+        const tickersPrices = await getStockInfo([unitNameWithSufix, tickerOn, tickerPn]);
+        const unitPrice = parseFloat(tickersPrices.find(t => t.ticker === unitNameWithSufix).c);
+        const onPrice = parseFloat(tickersPrices.find(t => t.ticker === tickerOn).c);
+        const pnPrice = parseFloat(tickersPrices.find(t => t.ticker === tickerPn).c);
+
+        unitInfo.atualizarPrecos(unitPrice, onPrice, pnPrice);
+
+        await msg.reply(`${unitInfo.nome} (${unitNameWithSufix})
+1 *${unitNameWithSufix}* = ${unitInfo.qtdOn} *${tickerOn}* + ${unitInfo.qtdPn} *${tickerPn}*
+
+*Cotações:*
+${unitNameWithSufix}: R$ ${unitInfo.precoUnit.toString().replace('.', ',')}
+${tickerOn}: R$ ${unitInfo.precoOn.toString().replace('.', ',')}
+${tickerPn}: R$ ${unitInfo.precoPn.toString().replace('.', ',')}
+
+${unitInfo.onBonifica ? 'Há' : 'Não há'} +10% em proventos nas ações PN.
+
+*Conclusão:*
+Comprar ${unitInfo.qualClasseComprar()} pode ser mais interessante no atual momento.`);
+    };
+
+}
+
+/**
+ * TAEE11
+1 TAEE11 = 1 TAEE3 + 2 TAEE4
+
+Cotações: 
+TAEE11: R$ 35,33
+TAEE3: R$ 11,82
+TAEE4: R$ 11,85
+
+Não há +10% em proventos nas ações PN.
+
+Conclusão:
+Comprar ON (TAEE3) pode ser mais interessante no atual momento.
+ */
+
+enum TipoAcao {
+    ORDINARIA = 'ON',
+    PREFERENCIAL = 'PN',
+    UNIT = 'Unit'
+}
+
+function getB3UnitInfo(unitName: string): B3UnitInfo {
+    const b3Unit = unitsInfo[unitName];
+    if (!b3Unit) {
+        return undefined;
+    }
+
+    return new B3UnitInfo(b3Unit)
+}
+
+function normalizeUnitName(unit: string) {
+    unit = unit.toUpperCase();
+    if (!unit.endsWith('11')) {
+        unit += '11';
+    }
+    return unit;
+}
