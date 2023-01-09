@@ -3,7 +3,6 @@ import { CounterNotifyerRunner } from "./counter-notifyer-runner";
 
 
 const { VDA_UPDATE_STATISTICS_EVERY_N_MINUTES, VDA_NOTIFY_EVERY_N_VIEWS, VDA_CHANNELS_TO_NOTIFY } = process.env;
-console.log(VDA_UPDATE_STATISTICS_EVERY_N_MINUTES, VDA_NOTIFY_EVERY_N_VIEWS, VDA_CHANNELS_TO_NOTIFY)
 
 const updateStatisticsEveryNMinuts = parseInt(VDA_UPDATE_STATISTICS_EVERY_N_MINUTES);
 const notifyEveryNViews = parseInt(VDA_NOTIFY_EVERY_N_VIEWS);
