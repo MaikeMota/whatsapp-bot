@@ -17,7 +17,7 @@ export abstract class CounterNotifyerRunner implements Runner {
 
     private loadedPreviewState = false;
 
-    abstract get name(): string;
+    abstract get runnerName(): string;
     abstract getCounter(): Promise<number>;
     abstract getNotifyMessage(counter: number): string;
 
@@ -28,10 +28,10 @@ export abstract class CounterNotifyerRunner implements Runner {
         if (!this.loadedPreviewState) {
             this.loadState();
         }
-        console.info(`[${this.name}][${new Date().toLocaleTimeString('pt-br')}] running`);
+        console.info(`[${this.runnerName}][${new Date().toLocaleTimeString('pt-br')}] running`);
         const counter = await this.getCounter();
         const shouldNotify = this.shouldNotify(counter, this.notifyFrequency);
-        console.info(`[${this.name}][${new Date().toLocaleTimeString('pt-br')}] lastCountNotified: ${this.lastCountNotified}, counter: ${counter}, notifyFrequency: ${this.notifyFrequency}.`);
+        console.info(`[${this.runnerName}][${new Date().toLocaleTimeString('pt-br')}] lastCountNotified: ${this.lastCountNotified}, counter: ${counter}, notifyFrequency: ${this.notifyFrequency}.`);
         if (shouldNotify) {
             this.lastCountNotified = counter;
             for (const channel of this.channelsToNotify) {
@@ -46,13 +46,13 @@ export abstract class CounterNotifyerRunner implements Runner {
     }
 
     protected async saveState() {
-        await this.stateSaver.save<CounterNotifyerSaveState>(this.name, {
+        await this.stateSaver.save<CounterNotifyerSaveState>(this.runnerName, {
             lastCountNotified: this.lastCountNotified
         });
     }
 
     protected async loadState() {
-        const savedState = await this.stateSaver.load<CounterNotifyerSaveState>(this.name);
+        const savedState = await this.stateSaver.load<CounterNotifyerSaveState>(this.runnerName);
         if (savedState) {
             this.lastCountNotified = savedState.lastCountNotified;
         }

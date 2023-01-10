@@ -1,14 +1,11 @@
 import { getChannelStatistics } from "../../services/youtube.service";
 import { CounterNotifyerRunner } from "./counter-notifyer-runner";
 
-
 const { VDA_UPDATE_STATISTICS_EVERY_N_MINUTES, VDA_NOTIFY_EVERY_N_SUBSCRIBERS,  VDA_CHANNELS_TO_NOTIFY } = process.env;
 
 const updateStatisticsEveryNMinuts = parseInt(VDA_UPDATE_STATISTICS_EVERY_N_MINUTES);
 const notifyEveryNSubscribers = parseInt(VDA_NOTIFY_EVERY_N_SUBSCRIBERS);
 const channelsToNotify = VDA_CHANNELS_TO_NOTIFY.split(',').map(c => c.trim());
-
-
 
 export class VDASubscribersNotifyerRunner extends CounterNotifyerRunner {
 
@@ -20,7 +17,7 @@ export class VDASubscribersNotifyerRunner extends CounterNotifyerRunner {
         super();
     }
 
-    get name() { return 'VDASubscribersNotifyerRunner'; }
+    get runnerName() { return 'VDASubscribersNotifyerRunner'; }
 
     async getCounter(): Promise<number> {
         return getChannelStatistics().then(r => r.subscriberCount);

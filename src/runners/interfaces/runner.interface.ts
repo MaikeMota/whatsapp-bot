@@ -1,7 +1,7 @@
 import { Client } from "whatsapp-web.js";
 
 export interface Runner {
-    name: string;
+    runnerName: string;
     runEveryNMinutes: number;
     run(client: Client): Promise<void>
     shutdown(): Promise<void>

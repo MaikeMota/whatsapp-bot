@@ -67,8 +67,8 @@ client.on('authenticated', async () => {
 
     runners.forEach(async runnerConstructor => {
         const runner = new runnerConstructor();
-        console.info(`Registering runner ${runner.name} to run every ${runner.runEveryNMinutes} minute(s)`)
-        const catchFun = (exception) => console.error(`Error while trying to run ${runner.name}`, exception)
+        console.info(`Registering runner ${runner.runnerName} to run every ${runner.runEveryNMinutes} minute(s)`)
+        const catchFun = (exception) => console.error(`Error while trying to run ${runner.runnerName}`, exception)
         
         await runner.run(client).catch(catchFun);
         const interval = setInterval(async () => {
