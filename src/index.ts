@@ -70,6 +70,7 @@ client.on('authenticated', async () => {
         console.info(`Registering runner ${runner.name} to run every ${runner.runEveryNMinutes} minute(s)`)
         const catchFun = (exception) => console.error(`Error while trying to run ${runner.name}`, exception)
         
+        await runner.run(client).catch(catchFun);
         const interval = setInterval(async () => {
             await runner.run(client).catch(catchFun);
         }, runner.runEveryNMinutes * 60 * 1000);
