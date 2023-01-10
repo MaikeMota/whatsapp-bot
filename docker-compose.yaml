@@ -19,12 +19,13 @@ services:
       - VDA_NOTIFY_EVERY_N_VIEWS=${VDA_NOTIFY_EVERY_N_VIEWS}
       - VDA_CHANNELS_TO_NOTIFY=${VDA_CHANNELS_TO_NOTIFY}
       - VDA_LINKS=${VDA_LINKS}
+      - TEMP_FOLDER=${TEMP_FOLDER}
     volumes:
       - type: bind
         source: ${AUTH_FOLDER}
         target: /app/.wwebjs_auth
       - type: bind
-        source: ${TEMP_FOLDER}
+        source: ${HOST_TEMP_FOLDER}
         target: /app/tmp
     restart: always
 
