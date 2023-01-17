@@ -22,7 +22,9 @@ import { TempoCommand } from './commands/tempo';
 import { TickerCommand } from './commands/ticker';
 import { VDACommand } from './commands/vda';
 import { B3UnitsCommand } from './commands/units';
+import { SelicCommand } from './commands/selic';
 import { Command } from './commands/command.interface';
+
 
 import { Runner } from './runners/interfaces/runner.interface';
 import { VDAViewsNotifyerRunner } from "./runners/vda/VDA-views-notifyer.runner";
@@ -69,7 +71,7 @@ client.on('authenticated', async () => {
         const runner = new runnerConstructor();
         console.info(`Registering runner ${runner.runnerName} to run every ${runner.runEveryNMinutes} minute(s)`)
         const catchFun = (exception) => console.error(`Error while trying to run ${runner.runnerName}`, exception)
-        
+
         await runner.run(client).catch(catchFun);
         const interval = setInterval(async () => {
             await runner.run(client).catch(catchFun);
@@ -97,7 +99,8 @@ const handlers: Constructor<Command>[] = [
     MentionAllAdminsCommand,
     DaniBotCommand,
     TranscreverCommand,
-    B3UnitsCommand
+    B3UnitsCommand,
+    SelicCommand
 ]
 
 const runners: Constructor<Runner>[] = [
