@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
+import { existsSync, readFileSync, writeFileSync, mkdirSync, unlinkSync } from "fs";
 import { resolve } from "path";
 
 import { StateSaver } from "./interfaces/state-save.interface";
@@ -11,16 +11,16 @@ const FILE_ENCODING = 'utf-8';
 
 export class JSONStateSaver<T> implements StateSaver<T> {
 
-    constructor(){  
+    constructor() {
         console.log(`[JSONStateSaver] Using ${tempFolder} as temp folder.`);
     }
 
-    async save<T>(key: string, state: T): Promise<void> {
+    async save(key: string, state: T): Promise<void> {
         const filePath = this.resolveFilePath(key);
         writeFileSync(filePath, JSON.stringify(state), { encoding: FILE_ENCODING });
     }
 
-    async load<T>(key: string): Promise<T> {
+    async load(key: string): Promise<T> {
         const filePath = this.resolveFilePath(key);
         if (existsSync(filePath)) {
             const json = readFileSync(filePath, { encoding: FILE_ENCODING });
@@ -30,6 +30,13 @@ export class JSONStateSaver<T> implements StateSaver<T> {
 
     private resolveFilePath(key: string) {
         return resolve(tempFolder, `${key}.json`);
+    }
+    remove(key: string): Promise<void> {
+        const filePath = this.resolveFilePath(key);
+        if (existsSync(filePath)) {
+            const json = unlinkSync(filePath);
+        }
+        return;
     }
 }
 

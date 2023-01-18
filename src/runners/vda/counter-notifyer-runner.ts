@@ -46,13 +46,13 @@ export abstract class CounterNotifyerRunner implements Runner {
     }
 
     protected async saveState() {
-        await this.stateSaver.save<CounterNotifyerSaveState>(this.runnerName, {
+        await this.stateSaver.save(this.runnerName, {
             lastCountNotified: this.lastCountNotified
         });
     }
 
     protected async loadState() {
-        const savedState = await this.stateSaver.load<CounterNotifyerSaveState>(this.runnerName);
+        const savedState = await this.stateSaver.load(this.runnerName);
         if (savedState) {
             this.lastCountNotified = savedState.lastCountNotified;
         }

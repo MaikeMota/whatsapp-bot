@@ -1,4 +1,5 @@
 export interface StateSaver<T> {
-    save<T>(key: string, state: T): Promise<void>;
-    load<T>(key: string): Promise<T>;
+    save(key: string, state: T): Promise<void>;
+    load(key: string): Promise<T>;
+    remove(key:string): Promise<void>
 }
