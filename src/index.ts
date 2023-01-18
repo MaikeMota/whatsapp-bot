@@ -23,6 +23,7 @@ import { TickerCommand } from './commands/ticker';
 import { VDACommand } from './commands/vda';
 import { B3UnitsCommand } from './commands/units';
 import { SelicCommand } from './commands/selic';
+import { TrackerCommand } from './commands/tracker';
 import { Command } from './commands/command.interface';
 
 
@@ -100,7 +101,8 @@ const handlers: Constructor<Command>[] = [
     DaniBotCommand,
     TranscreverCommand,
     B3UnitsCommand,
-    SelicCommand
+    SelicCommand,
+    TrackerCommand
 ]
 
 const runners: Constructor<Runner>[] = [
