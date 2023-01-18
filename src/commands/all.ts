@@ -5,6 +5,8 @@ const ALL_COMMAND_INTERVAL_IN_MINUTES = parseInt((process.env.ALL_COMMAND_INTERV
 
 const INTERVAL_BETWEEN_USES = ALL_COMMAND_INTERVAL_IN_MINUTES * 60 * 1000
 
+const BANNED_USERS = process.env.ALL_COMMAND_BANNED_USERS.split(',').map(u=> u.trim());
+
 const lastUses = {}
 const lastWarnings = {}
 
@@ -16,7 +18,8 @@ export class MentionAllCommand implements Command {
  _Marca todos os integrantes do grupo_
 `
     async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
-        return chat.isGroup;
+        const contact = await msg.getContact();
+        return chat.isGroup && BANNED_USERS.includes(contact.number);
     }
     async handle(client: Client, chat: GroupChat, msg: Message, ...argsArray: string[]): Promise<void> {
 
