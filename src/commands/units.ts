@@ -136,7 +136,7 @@ Comprar ON (TAEE3) pode ser mais interessante no atual momento.
 enum TipoAcao {
     ORDINARIA = 'ON',
     PREFERENCIAL = 'PN',
-    UNIT = 'Unit'
+    UNIT = 'UNIT'
 }
 
 function getB3UnitInfo(unitName: string): B3UnitInfo {
