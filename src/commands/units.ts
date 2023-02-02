@@ -49,7 +49,7 @@ class B3UnitInfo implements B3Unit {
     }
 
     qualClasseComprar(): TipoAcao {
-        if (this.precoUnit < (this.precoOn + this.precoPn)) {
+        if (this.precoUnit < this.precoTotalUnit) {
             return TipoAcao.UNIT;
         }
         if (this.onBonifica) {
@@ -63,6 +63,10 @@ class B3UnitInfo implements B3Unit {
         this.precoUnit = unitPrice;
         this.precoOn = onPrice;
         this.precoPn = pnPrice;
+    }
+
+    private get precoTotalUnit() {
+        return (this.precoOn * this.qtdOn) + (this.precoPn * this.qtdPn);
     }
 }
 
@@ -98,7 +102,7 @@ export class B3UnitsCommand implements Command {
         const whatToBuy = unitInfo.qualClasseComprar();
         const whatToBuyTicker = getTickerBasedOnStockType(whatToBuy, tickerOn, tickerPn, unitNameWithSufix);
 
-            await msg.reply(`${unitInfo.nome} (${unitNameWithSufix})
+        await msg.reply(`${unitInfo.nome} (${unitNameWithSufix})
 1 *${unitNameWithSufix}* = ${unitInfo.qtdOn} *${tickerOn}* + ${unitInfo.qtdPn} *${tickerPn}*
 
 *Cotações:*
