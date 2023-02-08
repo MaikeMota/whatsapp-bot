@@ -24,6 +24,7 @@ import { VDACommand } from './commands/vda';
 import { B3UnitsCommand } from './commands/units';
 import { SelicCommand } from './commands/selic';
 import { TrackerCommand } from './commands/tracker';
+import { CarteiraCommand } from './commands/carteira';
 import { Command } from './commands/command.interface';
 
 
@@ -102,7 +103,8 @@ const handlers: Constructor<Command>[] = [
     TranscreverCommand,
     B3UnitsCommand,
     SelicCommand,
-    TrackerCommand
+    TrackerCommand,
+    CarteiraCommand
 ]
 
 const runners: Constructor<Runner>[] = [
