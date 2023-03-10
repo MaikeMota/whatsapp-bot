@@ -1,36 +1,36 @@
-import { config as dotEnvConfig } from 'dotenv'
+import { config as dotEnvConfig } from 'dotenv';
 
 dotEnvConfig();
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const DUMP_MESSAGE = process.env.DUMP_MESSAGE === 'true';
 
-import * as  qrcode from 'qrcode-terminal';
+import * as qrcode from 'qrcode-terminal';
 
 import { Client, LocalAuth, Message } from 'whatsapp-web.js';
 
 import { Constructor } from './utils/constructor';
 
-import { SairCommand } from './commands/sair';
-import { TranscreverCommand } from './commands/transcrever';
-import { MentionAllCommand } from './commands/all';
 import { MentionAllAdminsCommand } from './commands/adms';
+import { MentionAllCommand } from './commands/all';
+import { CarteiraCommand } from './commands/carteira';
+import { Command } from './commands/command.interface';
 import { CriptoCommand } from './commands/cripto';
 import { DaniBotCommand } from './commands/danibot';
 import { GetIdCommand } from './commands/getId';
+import { SairCommand } from './commands/sair';
+import { SelicCommand } from './commands/selic';
 import { TempoCommand } from './commands/tempo';
 import { TickerCommand } from './commands/ticker';
-import { VDACommand } from './commands/vda';
-import { B3UnitsCommand } from './commands/units';
-import { SelicCommand } from './commands/selic';
 import { TrackerCommand } from './commands/tracker';
-import { CarteiraCommand } from './commands/carteira';
-import { Command } from './commands/command.interface';
+import { TranscreverCommand } from './commands/transcrever';
+import { B3UnitsCommand } from './commands/units';
+import { VDACommand } from './commands/vda';
 
 
 import { Runner } from './runners/interfaces/runner.interface';
-import { VDAViewsNotifyerRunner } from "./runners/vda/VDA-views-notifyer.runner";
 import { VDASubscribersNotifyerRunner } from "./runners/vda/VDA-subscribers-notifyer.runner";
+import { VDAViewsNotifyerRunner } from "./runners/vda/VDA-views-notifyer.runner";
 
 const client = new Client({
     authStrategy: new LocalAuth(),
@@ -72,11 +72,11 @@ client.on('authenticated', async () => {
     runners.forEach(async runnerConstructor => {
         const runner = new runnerConstructor();
         console.info(`Registering runner ${runner.runnerName} to run every ${runner.runEveryNMinutes} minute(s)`)
-        const catchFun = (exception) => console.error(`Error while trying to run ${runner.runnerName}`, exception)
+        const catchFn = (exception) => console.error(`Error while trying to run ${runner.runnerName}`, exception)
 
-        await runner.run(client).catch(catchFun);
+        await runner.run(client).catch(catchFn);
         const interval = setInterval(async () => {
-            await runner.run(client).catch(catchFun);
+            await runner.run(client).catch(catchFn);
         }, runner.runEveryNMinutes * 60 * 1000);
 
         runningRunners.push({
@@ -153,6 +153,14 @@ const handleMessage = async (msg: Message) => {
             } else {
                 await msg.reply("Comando Inválido! Modo de uso: \n" + handler.usage)
             }
+        }
+
+        if(msg.body.toLowerCase().includes('china')){
+            msg.react("🇨🇳")
+        }
+
+        if(msg.body.toLowerCase().includes('72h')){
+            msg.react("🇧🇷")
         }
     }
 

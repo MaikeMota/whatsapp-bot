@@ -42,7 +42,8 @@ interface Posicao {
     precoMedio: number,
     quantidade: number,
     dpaProjetivo: number,
-    proventosPago: number
+    dpaPago: number,
+    proventosRecebidos: number
 }
 
 interface CarteiraSaveState {
@@ -59,7 +60,7 @@ export class CarteiraCommand implements Command {
 /carteira visualizar TICKER
 /carteira cadastrar TICKER QUANTIDADE PREÇO_MÉDIO DPA_PROJETIVO PROVENTOS_PAGO
 /carteira compra TICKER QUANTIDADE VALOR_UNITARIO_COMPRA
-/carteira provento TICKER PROVENTO_RECEBIDO
+/carteira provento TICKER PROVENTO_RECEBIDO_POR_ACAO
 /carteira dpa TICKER DPA_PROJETIVO
 /carteira aportar VALOR_APORTE ORDENADO_POR TOP_N
 /carteira remover TICKER
@@ -108,7 +109,9 @@ export class CarteiraCommand implements Command {
     Quantidade:      ${formatToNumber(position.quantidade)}
     Preço Médio:     ${formatToBRL(position.precoMedio)}
     DPA Proj.:       ${formatToBRL(position.dpaProjetivo)}
-    Proventos Pagos: ${formatToBRL(position.proventosPago)}`)
+    DPA Proj. Pago:       ${formatToBRL(position.dpaPago)}
+    DPA Proj Restante.: ${formatToBRL(position.dpaProjetivo - position.dpaPago)}
+    Proventos Recebidos: ${formatToBRL(position.proventosRecebidos)}`)
                 }
 
             } else {
@@ -119,7 +122,9 @@ export class CarteiraCommand implements Command {
         Quantidade:      ${formatToNumber(position.quantidade)}
         Preço Médio:     ${formatToBRL(position.precoMedio)}
         DPA Proj.:       ${formatToBRL(position.dpaProjetivo)}
-        Proventos Pagos: ${formatToBRL(position.proventosPago)}`)
+        DPA Proj. Pago:       ${formatToBRL(position.dpaPago)}
+        DPA Proj Restante.:       ${formatToBRL(position.dpaProjetivo - position.dpaPago)}
+        Proventos Recebidos: ${formatToBRL(position.proventosRecebidos)}`)
                 } else {
                     for (const sufix of ['3', '4', '11']) {
                         const sufixedTicker = ticker + sufix;
@@ -129,7 +134,9 @@ export class CarteiraCommand implements Command {
             Quantidade:      ${formatToNumber(position.quantidade)}
             Preço Médio:     ${formatToBRL(position.precoMedio)}
             DPA Proj.:       ${formatToBRL(position.dpaProjetivo)}
-            Proventos Pagos: ${formatToBRL(position.proventosPago)}`)
+            DPA Proj. Pago:       ${formatToBRL(position.dpaPago)}
+            DPA Proj Restante.: ${formatToBRL(position.dpaProjetivo - position.dpaPago)}
+            Proventos Recebidos: ${formatToBRL(position.proventosPago)}`)
                     }
                 }
             }
@@ -139,7 +146,7 @@ export class CarteiraCommand implements Command {
         }
     }
 
-    // /carteira cadastrar TICKER QUANTIDADE PREÇO_MÉDIO DPA_PROJETIVO PROVENTOS_PAGO
+    // /carteira cadastrar TICKER QUANTIDADE PREÇO_MÉDIO DPA_PROJETIVO DPA_PAGO PROVENTOS_RECEBIDOS
     private async handleCadastrarEmpresaCommand(chat: Chat, msg: Message, ...argsArray: string[]) {
 
         const contactId = await extractContactId(msg);
@@ -150,7 +157,7 @@ export class CarteiraCommand implements Command {
             let wallet = await this.getWallet(key);
             let position = await this.getPosition(wallet, ticker);
 
-            const [_, quantidade, precoMedio, dpaProjetivo, proventosPago] = argsArray;
+            const [_, quantidade, precoMedio, dpaProjetivo, dpaPago, proventosRecebidos] = argsArray;
 
             const alreadyExists = !!position;
 
@@ -158,7 +165,8 @@ export class CarteiraCommand implements Command {
                 quantidade: parseInt(quantidade),
                 precoMedio: parseToNumber(precoMedio),
                 dpaProjetivo: parseToNumber(dpaProjetivo || '0'),
-                proventosPago: parseToNumber(proventosPago || '0')
+                dpaPago: parseToNumber(dpaPago || '0'),
+                proventosRecebidos: parseToNumber(proventosRecebidos || `0`)
             }
             wallet[ticker] = position;
             await this.stateSaver.save(key, wallet);
@@ -174,15 +182,15 @@ export class CarteiraCommand implements Command {
     private async handleAdicionarCompraCommand(chat: Chat, msg: Message, ...argsArray: string[]) {
         const contactId = await extractContactId(msg);
         try {
-            let ticker = await this.resolveTicker(...argsArray);
-            const [_, quantidadeStr, valorUnitarioCompraStr] = argsArray;
+            const [tickerStr, quantidadeStr, valorUnitarioCompraStr] = argsArray;
+            let ticker = await this.resolveTicker(tickerStr);
 
             const quantidade = parseInt(quantidadeStr);
             const valorUnitarioCompra = parseToNumber(valorUnitarioCompraStr);
 
             const key = this.resolveKey(contactId);
             let wallet = await this.getWallet(key);
-            const posicao = await this.getPosition(wallet, ticker);
+            const posicao = await this.getPosition(wallet, ticker); //TODO: permitir cadastrar a partir de uma compra
 
             const { novoPrecoMedio, novaQuantidade } = calcularNovaPosicao(posicao.precoMedio, posicao.quantidade, valorUnitarioCompra, quantidade);
 
@@ -199,7 +207,7 @@ export class CarteiraCommand implements Command {
         }
     }
 
-    // /carteira provento TICKER PROVENTO_RECEBIDO
+    // /carteira provento TICKER PROVENTO_RECEBIDO_POR_ACAO
     private async handleProventoCommand(chat: Chat, msg: Message, ...argsArray: string[]) {
         const contactId = await extractContactId(msg);
         try {
@@ -208,12 +216,14 @@ export class CarteiraCommand implements Command {
             let wallet = await this.getWallet(key);
             const position = await this.getPosition(wallet, ticker);
 
-            const [_, proventoRecebido] = argsArray;
-            position.proventosPago += parseToNumber(proventoRecebido || `0`)
+            const [_, dpaPagoStr] = argsArray;
+            const dpaPago = parseToNumber(dpaPagoStr || `0`)
+            position.dpaPago += dpaPago;
+            position.proventosRecebidos += dpaPago * position.quantidade
 
             await this.stateSaver.save(key, wallet);
 
-            await msg.reply(`Proventos para ${ticker} atualizados com sucesso! Total já pago para o ativo: ${formatToBRL(position.proventosPago)}`)
+            await msg.reply(`Proventos para ${ticker} atualizados com sucesso! Total já pago para o ativo: ${formatToBRL(position.dpaPago)}`)
         } catch (error) {
             await msg.reply(error);
             return;
@@ -230,7 +240,7 @@ export class CarteiraCommand implements Command {
             const position = await this.getPosition(wallet, ticker);
 
             const [_, dpaProjetivo] = argsArray;
-            position.dpaProjetivo = parseToNumber(dpaProjetivo || `0`)
+            position.dpaProjetivo += parseToNumber(dpaProjetivo || `0`)
 
             await this.stateSaver.save(key, wallet);
 
@@ -285,7 +295,7 @@ export class CarteiraCommand implements Command {
 
                 const quantidadeParaComprar = Math.floor(valorAporte / value.cotacao);
 
-                const proventosPendentes = value.dpaProjetivo - value.proventosPago;
+                const proventosPendentes = value.dpaProjetivo - value.dpaPago;
 
                 const proventosEsperadoDesteAporte = (quantidadeParaComprar * proventosPendentes);
 
