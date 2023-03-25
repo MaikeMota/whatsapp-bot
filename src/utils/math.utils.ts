@@ -12,3 +12,15 @@ export function calcularNovaPosicao(
         novoPrecoMedio
     }
 }
+
+export function getPercentualDiff(initialValue: number, currentValue: number) {
+    return ((currentValue - initialValue) / initialValue) * 100;
+}
+
+export function roundNumberTo(number: number, roundAt: number) {
+    const theRest = number % roundAt;
+    const roundedViews = Math.floor(number - theRest);
+    return roundedViews;
+}
+
+

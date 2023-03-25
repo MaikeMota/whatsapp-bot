@@ -5,7 +5,8 @@ import { Command } from "./command.interface";
 
 import { formatToBRL, formatToNumber, parseToNumber } from "brazilian-values";
 import { getStockInfo } from "../services/fcs-api.service";
-import { calcularNovaPosicao } from "../utils/math.utils";
+import { calcularNovaPosicao, getPercentualDiff } from "../utils/math.utils";
+import { asPercentageString } from "../utils/string.utils";
 import { extractContactId } from "../utils/whatsapp.util";
 
 
@@ -101,30 +102,33 @@ export class CarteiraCommand implements Command {
             const key = this.resolveKey(contactId);
             const wallet = await this.getWallet(key);
             const msgs = [];
-
             if (!ticker) {
-
+                const cotacoes = await getStockInfo(Object.keys(wallet))
                 for (const [ticker, position] of Object.entries(wallet)) {
-                    msgs.push(`[${ticker}]
-    Quantidade:      ${formatToNumber(position.quantidade)}
-    Preço Médio:     ${formatToBRL(position.precoMedio)}
-    DPA Proj.:       ${formatToBRL(position.dpaProjetivo)}
-    DPA Proj. Pago:       ${formatToBRL(position.dpaPago)}
-    DPA Proj Restante.: ${formatToBRL(position.dpaProjetivo - position.dpaPago)}
-    Proventos Recebidos: ${formatToBRL(position.proventosRecebidos)}`)
+                    const { c } = cotacoes.find(c => c.ticker === ticker);
+                    const percentDiff = getPercentualDiff(position.precoMedio, c)
+                    msgs.push(`*[${ticker}] ${formatToBRL(c)}*
+    _Quantidade_:      ${formatToNumber(position.quantidade)}
+    _Preço Médio_:     ${formatToBRL(position.precoMedio)} *(${asPercentageString(percentDiff)})*
+    _DPA Proj_.:       ${formatToBRL(position.dpaProjetivo)}
+    _DPA Proj_. Pago:       ${formatToBRL(position.dpaPago)}
+    _DPA Proj Restante_.: *${formatToBRL(position.dpaProjetivo - position.dpaPago)}*
+    _Proventos Recebidos_: *${formatToBRL(position.proventosRecebidos)}*`)
                 }
 
             } else {
                 const match = ticker.match(/[0-9]{1,2}$/)
                 if (match > 0) {
+                    const {c} = (await getStockInfo(ticker))[0]
                     const position = await this.getPosition(wallet, ticker);
-                    msgs.push(`[${ticker}]
-        Quantidade:      ${formatToNumber(position.quantidade)}
-        Preço Médio:     ${formatToBRL(position.precoMedio)}
-        DPA Proj.:       ${formatToBRL(position.dpaProjetivo)}
-        DPA Proj. Pago:       ${formatToBRL(position.dpaPago)}
-        DPA Proj Restante.:       ${formatToBRL(position.dpaProjetivo - position.dpaPago)}
-        Proventos Recebidos: ${formatToBRL(position.proventosRecebidos)}`)
+                    const percentDiff = getPercentualDiff(position.precoMedio, c)
+                    msgs.push(`*[${ticker}] ${formatToBRL(c[0].c)}*
+    _Quantidade_:      ${formatToNumber(position.quantidade)}
+    _Preço Médio_:     ${formatToBRL(position.precoMedio)} *(${asPercentageString(percentDiff)})*
+    _DPA Proj_.:       ${formatToBRL(position.dpaProjetivo)}
+    _DPA Proj_. Pago:       ${formatToBRL(position.dpaPago)}
+    _DPA Proj Restante_.:       *${formatToBRL(position.dpaProjetivo - position.dpaPago)}*
+    _Proventos Recebidos_: *${formatToBRL(position.proventosRecebidos)}*`)
                 } else {
                     for (const sufix of ['3', '4', '11']) {
                         const sufixedTicker = ticker + sufix;

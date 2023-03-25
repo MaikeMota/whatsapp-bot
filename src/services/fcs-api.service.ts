@@ -5,10 +5,10 @@ const DataTypeEnum = {
     CRYPTO: 'crypto'
 }
 
-const stocksCache = {};
-const criptoCache = {}
+const stocksCache = new Map<string, any>();
+const criptoCache = new Map<string, any>();
 
-async function retrieveData(dataType, ...tickers) {
+async function retrieveData(dataType, ...tickers: string[]) {
     const searchValue = tickers.join(',')
     const apiResult = await fetch(`https://fcsapi.com/api-v3/${dataType}/latest?symbol=${searchValue}&exchange=BM%26FBovespa&access_key=${FCS_API_KEY}`).then(r => r.json());
 
@@ -27,13 +27,13 @@ async function retrieveData(dataType, ...tickers) {
 
 }
 
-async function getStockInfo(tickers) {
+export async function getStockInfo(tickers: string[]) {
     const tickersInfo = [];
 
-    const tickersToRetrieve = [];
+    const tickersToRetrieve: string[] = [];
 
     for (const ticker of tickers) {
-        let tickInfo = stocksCache[ticker];
+        let tickInfo = stocksCache.get(ticker);
         if (tickInfo) {
             const { t } = tickInfo;
             if (hasCacheTimeExpired(t)) {
@@ -47,17 +47,17 @@ async function getStockInfo(tickers) {
     }
 
     if (tickersToRetrieve.length) {
-        const results = await retrieveData(DataTypeEnum.STOCK, tickersToRetrieve);
+        const results = await retrieveData(DataTypeEnum.STOCK, ...tickersToRetrieve);
         for (const result of results) {
-            stocksCache[result.ticker] = result;
+            stocksCache.set(result.ticker, result);
             tickersInfo.push(result)
         }
     }
     return tickersInfo.sort((a, b) => { if (a.ticker > b.ticker) return 1; if (b.ticker > a.ticker) return -1; return 0; })
 }
 
-async function getCriptoInfo(ticker) {
-    let tickInfo = criptoCache[ticker];
+export async function getCriptoInfo(ticker: string) {
+    let tickInfo = criptoCache.get(ticker);
     if (tickInfo) {
         const { t } = tickInfo;
         if (hasCacheTimeExpired(t)) {
@@ -66,7 +66,7 @@ async function getCriptoInfo(ticker) {
     } else {
         tickInfo = await retrieveData(DataTypeEnum.CRYPTO, ticker)
     }
-    criptoCache[ticker] = tickInfo;
+    criptoCache.set(ticker, tickInfo);
     return tickInfo
 }
 
@@ -74,16 +74,10 @@ function hasCacheTimeExpired(cachedTime) {
     return (new Date().getTime() / 1000) > (cachedTime + (60 * 60));
 }
 
-function getSymbolFor(name) {
+export function getSymbolFor(name) {
     switch (name) {
         case 'brl': return 'R$';
         case 'usd': return 'U$';
         default: return '$';
     }
-}
-
-module.exports = {
-    getCriptoInfo,
-    getStockInfo,
-    getSymbolFor
 }

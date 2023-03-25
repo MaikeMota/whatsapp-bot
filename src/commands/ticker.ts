@@ -1,7 +1,7 @@
 import { Chat, Client, Message } from "whatsapp-web.js";
 import { Command } from "./command.interface";
 
-const { getStockInfo } = require("../services/fcs-api.service");
+import { getStockInfo } from "../services/fcs-api.service";
 
 
 export class TickerCommand implements Command {
@@ -18,30 +18,36 @@ export class TickerCommand implements Command {
 
         if (isMultiple) {
 
-            const results = await getStockInfo(argsArray);
-
-            let tickersMessage = ""
-            for (const result of results) {
-                tickersMessage += this.getOneLineTickerMessage(result) + "\n"
-            }
-
+            let tickersMessage = await this.handleMultipleTickers(argsArray);
             await msg.reply(`${tickersMessage}`)
+            return
 
-        } else {
-            const [args] = argsArray;
-
-            const ticker = args.toLowerCase();
-            const ticksInfo = await getStockInfo([ticker]);
-            const tickInfo = ticksInfo[0];
-            if (!tickInfo) {
-                msg.reply(`Não consegui encontrar informações sobre o preço de ${ticker}`);
-                return;
-            }
-            const lastUpdateDate = new Date(tickInfo.t * 1000);
-            const horaAtualizacao = lastUpdateDate.toLocaleTimeString();
-
-            await msg.reply(this.getTickerMessage(tickInfo, horaAtualizacao));
         }
+
+        const [args] = argsArray;
+
+        const ticker = args.toLowerCase();
+        const ticksInfo = await getStockInfo([ticker]);
+        const tickInfo = ticksInfo[0];
+        if (!tickInfo) {
+            msg.reply(`Não consegui encontrar informações sobre o preço de ${ticker}`);
+            return;
+        }
+        const lastUpdateDate = new Date(tickInfo.t * 1000);
+        const horaAtualizacao = lastUpdateDate.toLocaleTimeString();
+
+        await msg.reply(this.getTickerMessage(tickInfo, horaAtualizacao));
+
+    }
+
+    private async handleMultipleTickers(argsArray: string[]): Promise<string> {
+        const results = await getStockInfo(argsArray);
+
+        let tickersMessage = "";
+        for (const result of results) {
+            tickersMessage += this.getOneLineTickerMessage(result) + "\n";
+        }
+        return tickersMessage;
     }
 
     private getOneLineTickerMessage(tickInfo) {
