@@ -1,4 +1,5 @@
 import { getChannelStatistics } from "../../services/youtube.service";
+import { roundNumberTo } from "../../utils/math.utils";
 import { CounterNotifyerRunner } from "./counter-notifyer-runner";
 
 const { VDA_UPDATE_STATISTICS_EVERY_N_MINUTES, VDA_NOTIFY_EVERY_N_VIEWS, VDA_CHANNELS_TO_NOTIFY } = process.env;
@@ -18,10 +19,9 @@ export class VDAViewsNotifyerRunner extends CounterNotifyerRunner {
     }
 
     protected shouldNotify(counter: number, notifyFrequency: number) {
-        const leftOverViews = counter % notifyFrequency;
-        const roundedViews = Math.floor(counter - leftOverViews);
-        const shouldNotify = roundedViews % notifyFrequency === 0;
-        return shouldNotify && counter > this.lastCountNotified;
+        const actualViews = roundNumberTo(counter, notifyFrequency);
+        const lastViews = roundNumberTo(this.lastCountNotified, notifyFrequency)
+        return actualViews > lastViews;
     }
 
     get runnerName() { return 'VDAViewsNotifyerRunner'; }
