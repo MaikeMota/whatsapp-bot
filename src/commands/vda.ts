@@ -56,7 +56,7 @@ export class VDACommand implements Command {
     }
 
     private async handlePromotionalLinks(msg) {
-        await msg.reply(`🐊 Assine a plataforma AGF+ com 30% de desconto: https://bit.ly/3nJHQUl
+        await msg.reply(`🐊 Assine a plataforma AGF+ com 30% de desconto: http://bit.ly/3JTkcQ7
     
     Considere comprar um dos livros recomendados pelos links abaixo:
     
