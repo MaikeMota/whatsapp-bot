@@ -43,7 +43,7 @@ export abstract class Command {
     };
 
     get usage(): string {
-        if (!this.isSubCommand) {
+        if (this.isSubCommand) {
             return `${this.command} ${this.usageDescription}`;
         }
         return this.subCommands?.map(subCommand => `${this.command} ${subCommand.usage}`).join('\n');
