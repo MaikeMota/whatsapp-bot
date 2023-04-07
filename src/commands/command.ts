@@ -22,7 +22,7 @@ export abstract class Command {
             }
             return false;
         }
-        return (this.command === command || this.alternativeCommands.includes(command));
+        return true; // TODO call hook to validate args for the command
     }
     
     async handle(client: Client, chat: Chat, msg: Message, ...[command, ...argsArray]: string[]): Promise<void> {
