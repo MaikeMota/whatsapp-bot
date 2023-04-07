@@ -2,18 +2,18 @@ import { Chat, Client, Message } from "whatsapp-web.js";
 import { Command } from "./command";
 
 import { getStockInfo } from "../services/fcs-api.service";
+import { hasCategorySuffix } from "../utils/ticker.util";
 
 
 export class TickerCommand extends Command {
     command = '/ticker';
-    alternativeCommands = ['/cotação'];
+    alternativeCommands = ['cotação'];
     
     usageDescription = '<ticker> - Obtem a cotação do ativo. Exemplo: /ticker bbas3';
 
     async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
-        const [args] = argsArray;
-        const [ticker] = args.split(' ');
-        return !!ticker;
+        const [ticker] = argsArray;
+        return !!ticker && hasCategorySuffix(ticker);
     }
     
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {

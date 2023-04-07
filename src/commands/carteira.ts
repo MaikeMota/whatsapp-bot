@@ -7,6 +7,7 @@ import { formatToBRL, formatToNumber, parseToNumber } from "brazilian-values";
 import { getStockInfo } from "../services/fcs-api.service";
 import { calcularNovaPosicao, getPercentualDiff } from "../utils/math.utils";
 import { asPercentageString } from "../utils/string.utils";
+import { hasCategorySuffix } from "../utils/ticker.util";
 import { extractContactId } from "../utils/whatsapp.util";
 
 
@@ -108,8 +109,8 @@ export class CarteiraCommand extends Command {
                 }
 
             } else {
-                const match = ticker.match(/[0-9]{1,2}$/)
-                if (match > 0) {
+                const hasSufix = hasCategorySuffix(ticker)
+                if (hasSufix) {
                     const {c} = (await getStockInfo([ticker]))[0]
                     const position = await this.getPosition(wallet, ticker);
                     const percentDiff = getPercentualDiff(position.precoMedio, c)
