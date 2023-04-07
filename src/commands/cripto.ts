@@ -5,8 +5,6 @@ import { getCriptoInfo, getSymbolFor } from "../services/fcs-api.service";
 
 export class CriptoCommand extends Command {
     command = '/cripto';
-    alternativeCommands = ['/crypto'];
-
     usageDescription = '<pair> - Mostra o preço de uma criptomoeda.\n\nExemplo:\n\n/cripto btc\n/cripto btc/usd';
     
     async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {

@@ -75,6 +75,11 @@ export class B3UnitsCommand extends Command {
     
     usageDescription: string = "<nome da unit> - Recupera informações sobre a unit informada. Ex: /unit TAEE11";
 
+    async isUsageValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
+        const [unitName] = argsArray;
+        return !!unitName;
+    }
+
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]) {
 
         const [unitName] = argsArray;

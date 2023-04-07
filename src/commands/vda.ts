@@ -13,6 +13,7 @@ const AVAILABLE_SUBCOMMANDS = [...VIDEO_SUBCOMMANDS, ...INSCRITOS_SUBCOMMANDS, .
 export class VDACommand extends Command {
     command = '/vda';
     alternativeCommands = ['/vidacionista'];
+    usageDescription = "";
 //     usage = `
 // */vda vídeo*
 // */vidacionista vídeo*

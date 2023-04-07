@@ -7,7 +7,7 @@ import { hasCategorySuffix } from "../utils/ticker.util";
 
 export class TickerCommand extends Command {
     command = '/ticker';
-    alternativeCommands = ['cotação'];
+    alternativeCommands = ['/cotação'];
     
     usageDescription = '<ticker> - Obtem a cotação do ativo. Exemplo: /ticker bbas3';
 

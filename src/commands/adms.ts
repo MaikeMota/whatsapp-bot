@@ -6,9 +6,9 @@ export class MentionAllAdminsCommand extends Command {
     alternativeCommands = ['@admins', '@adms', '@adm']
     
     async handle(client: Client, chat: GroupChat, msg: Message, ...argsArray: string[]): Promise<void> {
+
         let text = "";
         let mentions = [];
-
         for (let participant of chat.participants) {
             const contact = await client.getContactById(participant.id._serialized);
             if (participant.isAdmin || participant.isSuperAdmin) {
@@ -16,7 +16,6 @@ export class MentionAllAdminsCommand extends Command {
                 text += ` @${participant.id.user}`;
             }
         }
-
         await chat.sendMessage(text, { mentions });
     }
 
