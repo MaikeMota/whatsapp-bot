@@ -1,18 +1,21 @@
 import { Chat, Client, Message } from "whatsapp-web.js";
-import { Command } from "./command.interface";
+import { Command } from "./command";
 
 import { getStockInfo } from "../services/fcs-api.service";
 
 
-export class TickerCommand implements Command {
+export class TickerCommand extends Command {
     command = '/ticker';
     alternativeCommands = ['/cotação'];
-    usage = '/ticker tickerDaEmpresa';
+    
+    usageDescription = '<ticker> - Obtem a cotação do ativo. Exemplo: /ticker bbas3';
+
     async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
         const [args] = argsArray;
         const [ticker] = args.split(' ');
         return !!ticker;
     }
+    
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
         const isMultiple = argsArray.length > 1
 

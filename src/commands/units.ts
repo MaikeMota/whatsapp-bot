@@ -17,7 +17,7 @@
 
 
 import { Chat, Client, Message } from "whatsapp-web.js";
-import { Command } from "./command.interface";
+import { Command } from "./command";
 
 import { getStockInfo } from "../services/fcs-api.service";
 
@@ -70,13 +70,11 @@ class B3UnitInfo implements B3Unit {
     }
 }
 
-export class B3UnitsCommand implements Command {
+export class B3UnitsCommand extends Command {
     command: string = "/unit";
-    alternativeCommands: string[] = [];
-    usage: string = "";
-    async isValid(chat: Chat, msg: Message, ...argsArray: string[]) {
-        return true;
-    }
+    
+    usageDescription: string = "<nome da unit> - Recupera informações sobre a unit informada. Ex: /unit TAEE11";
+
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]) {
 
         const [unitName] = argsArray;

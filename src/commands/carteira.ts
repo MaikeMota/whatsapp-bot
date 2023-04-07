@@ -1,7 +1,7 @@
 import { Chat, Client, Message } from "whatsapp-web.js";
 import { StateSaver } from "../utils/interfaces/state-save.interface";
 import { JSONStateSaver } from "../utils/json-state-saver";
-import { Command } from "./command.interface";
+import { Command } from "./command";
 
 import { formatToBRL, formatToNumber, parseToNumber } from "brazilian-values";
 import { getStockInfo } from "../services/fcs-api.service";
@@ -51,21 +51,12 @@ interface CarteiraSaveState {
     [ticker: string]: Posicao
 }
 
-export class CarteiraCommand implements Command {
+export class CarteiraCommand extends Command {
 
     private stateSaver: StateSaver<CarteiraSaveState> = new JSONStateSaver<CarteiraSaveState>();
 
     command = '/carteira';
-    alternativeCommands = [];
-    usage = `
-/carteira visualizar TICKER
-/carteira cadastrar TICKER QUANTIDADE PREÇO_MÉDIO DPA_PROJETIVO PROVENTOS_PAGO
-/carteira compra TICKER QUANTIDADE VALOR_UNITARIO_COMPRA
-/carteira provento TICKER PROVENTO_RECEBIDO_POR_ACAO
-/carteira dpa TICKER DPA_PROJETIVO
-/carteira aportar VALOR_APORTE ORDENADO_POR TOP_N
-/carteira remover TICKER
-    `;
+    
     async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
         const [firstArg] = argsArray;
         return AVAILABLE_SUBCOMMANDS.includes(firstArg);

@@ -9,12 +9,12 @@ import * as qrcode from 'qrcode-terminal';
 
 import { Client, LocalAuth, Message } from 'whatsapp-web.js';
 
+import { Command } from './commands/command';
 import { Constructor } from './utils/constructor';
 
 import { MentionAllAdminsCommand } from './commands/adms';
 import { MentionAllCommand } from './commands/all';
 import { CarteiraCommand } from './commands/carteira';
-import { Command } from './commands/command.interface';
 import { CriptoCommand } from './commands/cripto';
 import { DaniBotCommand } from './commands/danibot';
 import { GetIdCommand } from './commands/getId';
@@ -22,7 +22,7 @@ import { SairCommand } from './commands/sair';
 import { SelicCommand } from './commands/selic';
 import { TempoCommand } from './commands/tempo';
 import { TickerCommand } from './commands/ticker';
-import { TrackerCommand } from './commands/tracker';
+import { TrackerCommand } from './commands/tracker/tracker';
 import { TranscreverCommand } from './commands/transcrever';
 import { B3UnitsCommand } from './commands/units';
 import { VDACommand } from './commands/vda';
@@ -72,7 +72,7 @@ client.on('authenticated', async () => {
     runners.forEach(async runnerConstructor => {
         const runner = new runnerConstructor();
         console.info(`Registering runner ${runner.runnerName} to run every ${runner.runEveryNMinutes} minute(s)`)
-        const catchFn = (exception) => console.error(`Error while trying to run ${runner.runnerName}`, exception)
+        const catchFn = (exception: Error) => console.error(`Error while trying to run ${runner.runnerName}`, exception)
 
         await runner.run(client).catch(catchFn);
         const interval = setInterval(async () => {
@@ -112,7 +112,7 @@ const runners: Constructor<Runner>[] = [
     VDAViewsNotifyerRunner
 ];
 
-const registerCommand = (command: string, handler: Command, handlers) => {
+const registerCommand = (command: string, handler: Command, handlers: CommandMap) => {
     command = IS_PRODUCTION ? command : `${command}-dev`
     if (handlers[command]) {
         console.error(`Já existe um handler para o comando ${command}`)
@@ -122,7 +122,11 @@ const registerCommand = (command: string, handler: Command, handlers) => {
     }
 }
 
-const RegisteredHandlers: { [key: string]: Command } = {}
+type CommandMap = {
+    [key: string]: Command;
+};
+
+const RegisteredHandlers: CommandMap = {}
 
 
 
@@ -151,7 +155,7 @@ const handleMessage = async (msg: Message) => {
                     console.error(e);
                 }
             } else {
-                await msg.reply("Comando Inválido! Modo de uso: \n" + handler.usage)
+                await msg.reply("Comando Inválido! Modo de uso:\n\n" + handler.usage)
             }
         }
 
@@ -164,45 +168,7 @@ const handleMessage = async (msg: Message) => {
         }
     }
 
-    //   if (chat.name.includes('Knife') || chat.name.includes('NEUROSE')) {
-    //                 if (new Date().getTime() % 13 === 0) {
-    //                     chat.sendMessage(chat.id, `[DaniBot] says: ${lerolero()}`).catch(console.log);
-    //                 } else if (new Date().getTime() % 17 === 0) {
-    //                     chat.sendMessage(chat.id, `😂😂😂😂`).catch(console.log);
-    //                 } else {
-
-    //                     if (typeof msg.body === "string" && msg.body.toLowerCase().includes('china')) {
-    //                         msg.reply('🇨🇳');
-    //                         return
-    //                     }
-
-    //                     const contact = await msg.getContact();
-    //                     if (contact.number === "554399388488") {
-
-    //                         if (msg.body === '@554399867608 uq se acha?') {
-    //                             msg.replY(lerolero())
-    //                         } else {
-    //                             const n = randomIntFromInterval(1, 6)
-    //                             const reply = n === 3;
-
-    //                             if (reply) {
-    //                                 const options = ["xama", "🔥", "🔥🔥 no kwai", "estourou no kwai", "jogador caro", "Tchaaaco"];
-    //                                 msg.reply(options[randomIntFromInterval(0, options.length - 1)]);
-    //                             } else {
-    //                                 console.log(`Sorted number ${n}... not this time...`)
-    //                             }
-    //                         }
-
-    //                     }
-    //                 }
-
-    //             }
-
-    //         }
-
 }
-
-const frasesBruno = ["ah velho, pára mano"]
 
 client.on('message_create', handleMessage);
 
