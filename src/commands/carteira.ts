@@ -110,10 +110,10 @@ export class CarteiraCommand extends Command {
             } else {
                 const match = ticker.match(/[0-9]{1,2}$/)
                 if (match > 0) {
-                    const {c} = (await getStockInfo(ticker))[0]
+                    const {c} = (await getStockInfo([ticker]))[0]
                     const position = await this.getPosition(wallet, ticker);
                     const percentDiff = getPercentualDiff(position.precoMedio, c)
-                    msgs.push(`*[${ticker}] ${formatToBRL(c[0].c)}*
+                    msgs.push(`*[${ticker}] ${formatToBRL(c)}*
     _Quantidade_:      ${formatToNumber(position.quantidade)}
     _Preço Médio_:     ${formatToBRL(position.precoMedio)} *(${asPercentageString(percentDiff)})*
     _DPA Proj_.:       ${formatToBRL(position.dpaProjetivo)}
