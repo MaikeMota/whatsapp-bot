@@ -17,13 +17,13 @@ export class DaniBotCommand implements Command {
         }
         const rn = randomIntFromInterval(1, 6);
         const useClassic = rn === 2 || rn === 4;
-        let message = "[DaniBot] says: ";
+        let message = "[DaniBot] disse: ";
         if (useClassic) {
             message += CLASSICAS_DANI[randomIntFromInterval(0, CLASSICAS_DANI.length - 1)];
         } else {
             message += lerolero()
         }
-        await msg.reply(`[DaniBot] says: ${lerolero()}`)
+        await msg.reply(`[DaniBot] disse: ${lerolero()}`)
     }
 }
 
