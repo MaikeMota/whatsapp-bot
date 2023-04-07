@@ -1,22 +1,19 @@
 import * as fs from 'fs';
-import * as path from 'path'
+import * as path from 'path';
 
-import { Client, Chat, Message, MessageTypes } from 'whatsapp-web.js';
-import { Command } from './command.interface';
+import { Chat, Client, Message } from 'whatsapp-web.js';
+import { Command } from './command';
 
 import { Deepgram } from '@deepgram/sdk';
 
 
 const deepgram = new Deepgram(process.env.DEEPGRAM_APY);
 
-export class TranscreverCommand implements Command {
+export class TranscreverCommand extends Command {
     command: string = '/transcrever';
-    alternativeCommands: string[] = []
-    usage: string;
-
-    async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
-        return true;
-    }
+    
+    usageDescription = '<audio> - Transcreve o áudio para texto';
+    
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
         if (!msg.fromMe) {
             return

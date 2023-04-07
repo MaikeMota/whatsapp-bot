@@ -1,5 +1,5 @@
-import { Chat, Client, GroupChat, Message } from "whatsapp-web.js";
-import { Command } from "./command.interface";
+import { Client, GroupChat, Message } from "whatsapp-web.js";
+import { Command } from "./command";
 
 const ALL_COMMAND_INTERVAL_IN_MINUTES = parseInt((process.env.ALL_COMMAND_INTERVAL_IN_MINUTES || `5`))
 
@@ -10,16 +10,10 @@ const BANNED_USERS = process.env.ALL_COMMAND_BANNED_USERS.split(',').map(u => u.
 const lastUses = {}
 const lastWarnings = {}
 
-export class MentionAllCommand implements Command {
+export class MentionAllCommand extends Command {
     command = '@all';
-    alternativeCommands = [];
-    usage = `
-*@all*
- _Marca todos os integrantes do grupo_
-`
-    async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
-        return true
-    }
+    alternativeCommands = ['@todos']
+
     async handle(client: Client, chat: GroupChat, msg: Message, ...argsArray: string[]): Promise<void> {
 
         const contact = await msg.getContact();

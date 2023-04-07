@@ -1,16 +1,13 @@
 import { Chat, Client, Message } from "whatsapp-web.js";
-import { Command } from "./command.interface";
+import { Command } from "./command";
 
 const { randomIntFromInterval } = require('../utils/util');
 const lerolero = require('lerolero');
 
-export class DaniBotCommand implements Command {
+export class DaniBotCommand extends Command {
     command= '/danibot';
     alternativeCommands= ['!danibot', '/botdani', '!botdani', '/dani', '!dani'];
-    usage= '';
-    async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
-        return true
-    }
+    
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
         if(!chat.name.includes('Knife') && !chat.name.includes('NEUROSE')){
             return

@@ -1,19 +1,21 @@
 import { Chat, Client, Message } from "whatsapp-web.js";
-import { Command } from "./command.interface";
+import { Command } from "./command";
 
-import { getSymbolFor, getCriptoInfo } from "../services/fcs-api.service";
+import { getCriptoInfo, getSymbolFor } from "../services/fcs-api.service";
 
-export class CriptoCommand implements Command {
+export class CriptoCommand extends Command {
     command = '/cripto';
-    alternativeCommands = ['/crypto'];
-    usage = `/cripto symbol\n
-/cripto symbol/currency\n
-/cripto eth/usd`;
+    usageDescription = '<pair> - Mostra o preço de uma criptomoeda.\n\nExemplo:\n\n/cripto btc\n/cripto btc/usd';
+    
     async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
+        if (!argsArray.length) {
+            return false;
+        }
         const [args] = argsArray;
         const [symbol] = args.split('/');
         return !!symbol;
     }
+    
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
 
         const [args] = argsArray;

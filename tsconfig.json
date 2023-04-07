@@ -6,7 +6,9 @@
         "sourceMap": true,
         "outDir": "dist",
         "allowJs": true,
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "forceConsistentCasingInFileNames": true
+        
     },
     "include": [
         "src/**/*"

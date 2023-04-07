@@ -1,16 +1,17 @@
 import { Chat, Client, Message } from "whatsapp-web.js";
-import { Command } from "./command.interface";
+import { Command } from "./command";
 
 const { getWheater } = require('../services/wheater.service');
 
-export class TempoCommand implements Command {
+export class TempoCommand extends Command {
     command = '/tempo';
-    alternativeCommands = [];
-    usage = `*/tempo nome da sua cidade
-    _Retorna dados sobre o tempo na cidade digitada_`;
+    
+    usageDescription = '<cidade> - Recupera a previsão do tempo para a cidade informada.'
+    
     async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
         return argsArray.length > 0
     }
+    
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
         let cidade = argsArray.length > 1 ? argsArray.join(' ') : argsArray[0];
         const wheaterInfo = await getWheater(cidade);

@@ -1,12 +1,13 @@
 import { Chat, Client, Message } from "whatsapp-web.js";
 import { StateSaver } from "../utils/interfaces/state-save.interface";
 import { JSONStateSaver } from "../utils/json-state-saver";
-import { Command } from "./command.interface";
+import { Command } from "./command";
 
 import { formatToBRL, formatToNumber, parseToNumber } from "brazilian-values";
 import { getStockInfo } from "../services/fcs-api.service";
 import { calcularNovaPosicao, getPercentualDiff } from "../utils/math.utils";
 import { asPercentageString } from "../utils/string.utils";
+import { hasCategorySuffix } from "../utils/ticker.util";
 import { extractContactId } from "../utils/whatsapp.util";
 
 
@@ -51,21 +52,12 @@ interface CarteiraSaveState {
     [ticker: string]: Posicao
 }
 
-export class CarteiraCommand implements Command {
+export class CarteiraCommand extends Command {
 
     private stateSaver: StateSaver<CarteiraSaveState> = new JSONStateSaver<CarteiraSaveState>();
 
     command = '/carteira';
-    alternativeCommands = [];
-    usage = `
-/carteira visualizar TICKER
-/carteira cadastrar TICKER QUANTIDADE PREÇO_MÉDIO DPA_PROJETIVO PROVENTOS_PAGO
-/carteira compra TICKER QUANTIDADE VALOR_UNITARIO_COMPRA
-/carteira provento TICKER PROVENTO_RECEBIDO_POR_ACAO
-/carteira dpa TICKER DPA_PROJETIVO
-/carteira aportar VALOR_APORTE ORDENADO_POR TOP_N
-/carteira remover TICKER
-    `;
+    
     async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
         const [firstArg] = argsArray;
         return AVAILABLE_SUBCOMMANDS.includes(firstArg);
@@ -117,12 +109,12 @@ export class CarteiraCommand implements Command {
                 }
 
             } else {
-                const match = ticker.match(/[0-9]{1,2}$/)
-                if (match > 0) {
-                    const {c} = (await getStockInfo(ticker))[0]
+                const hasSufix = hasCategorySuffix(ticker)
+                if (hasSufix) {
+                    const {c} = (await getStockInfo([ticker]))[0]
                     const position = await this.getPosition(wallet, ticker);
                     const percentDiff = getPercentualDiff(position.precoMedio, c)
-                    msgs.push(`*[${ticker}] ${formatToBRL(c[0].c)}*
+                    msgs.push(`*[${ticker}] ${formatToBRL(c)}*
     _Quantidade_:      ${formatToNumber(position.quantidade)}
     _Preço Médio_:     ${formatToBRL(position.precoMedio)} *(${asPercentageString(percentDiff)})*
     _DPA Proj_.:       ${formatToBRL(position.dpaProjetivo)}
