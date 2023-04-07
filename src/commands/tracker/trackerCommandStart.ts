@@ -12,6 +12,11 @@ export class TrackerCommandStart extends Command {
 
     usageDescription: string = "<chave> <descrição?> - Incia um tracking para a chave informada";
 
+    protected async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
+        const [key] = argsArray;
+        return !!key;
+    }
+
     async handle(_: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
         const [key, ...descriptionAsArray] = argsArray;
         const stateKey = resolveKey(await extractContactId(msg), key);
@@ -28,5 +33,9 @@ export class TrackerCommandStart extends Command {
 
         stateSaver.save(stateKey, state);
         await msg.reply(`Tracking iniciado com sucesso!`);
+    }
+
+    get isV2(): boolean {
+        return true
     }
 }

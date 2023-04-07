@@ -11,6 +11,11 @@ export class TrackerCommandStop extends Command {
 
     usageDescription: string = "<chave> <descrição?> - Finaliza o tracking para a chave informada";
 
+    protected async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
+        const [key] = argsArray;
+        return !!key;
+    }
+
     async handle(_: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
         const [key] = argsArray;
         const stateKey = resolveKey(await extractContactId(msg), key);
@@ -35,5 +40,9 @@ ${status.description ? status.description + '\n' : ''}
 Tempo Decorrido: ${timeElapsed} `);
 
         await stateSaver.remove(stateKey);
+    }
+
+    get isV2(): boolean {
+        return true
     }
 }
