@@ -13,16 +13,20 @@ export abstract class Command {
     parentCommand?: Command;
     usageDescription?: string;
 
-    async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
+    async isUsageValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
         const [command] = argsArray;
         if (this.hasSubCommands) {
             const subCommand = this.subCommands.find(subCommand => subCommand.command === command || subCommand.alternativeCommands.includes(command))
             if (subCommand) {
-                return subCommand.isValid(chat, msg, ...argsArray);
+                return subCommand.isUsageValid(chat, msg, ...argsArray);
             }
             return false;
         }
-        return true; // TODO call hook to validate args for the command
+        return this.isValid(chat, msg, ...argsArray.slice(+this.isV2));
+    }
+
+    protected async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
+        return true;
     }
     
     async handle(client: Client, chat: Chat, msg: Message, ...[command, ...argsArray]: string[]): Promise<void> {
@@ -34,6 +38,10 @@ export abstract class Command {
         }        
     }
 
+    get isV2(): boolean {
+        return false
+    }
+
     get isSubCommand(): boolean {
         return !!this.parentCommand;
     }
@@ -43,10 +51,10 @@ export abstract class Command {
     };
 
     get usage(): string {
-        if (this.isSubCommand) {
-            return `${this.command} ${this.usageDescription}`;
+        if (this.hasSubCommands) {
+            return this.subCommands?.map(subCommand => `${this.command} ${subCommand.usage}`).join('\n');
         }
-        return this.subCommands?.map(subCommand => `${this.command} ${subCommand.usage}`).join('\n');
+        return `${this.command} ${this.usageDescription}`;
     }
 
 }

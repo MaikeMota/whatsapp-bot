@@ -146,7 +146,7 @@ const handleMessage = async (msg: Message) => {
         const handler = RegisteredHandlers[command]
         if (handler) {
             console.info(`Message contains a registered command ${command}`);
-            if (await handler.isValid(chat, msg, ...argsArray)) {
+            if (await handler.isUsageValid(chat, msg, ...argsArray)) {
                 try {
                     console.info(`Calling handler for ${command}`);
                     await handler.handle(client, chat, msg, ...argsArray);
