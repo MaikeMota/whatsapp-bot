@@ -9,7 +9,7 @@ export class TrackerCommandStop extends Command {
     command = "stop";
     alternativeCommands = ["parar", "finalizar"];
 
-    usageDescription: string = "<chave> <descrição> - Finaliza o tracking para a chave informada";
+    usageDescription: string = "<chave> <descrição?> - Finaliza o tracking para a chave informada";
 
     async handle(_: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
         const [key] = argsArray;

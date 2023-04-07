@@ -17,6 +17,5 @@ export class TrackerCommand extends Command {
     command = '/tracker';
     alternativeCommands = [];
     subCommands = [new TrackerCommandStart(this), new TrackerCommandStop(this)];
-    usageDescription?: string = "TODO";
 }
 
