@@ -13,7 +13,7 @@ async function retrieveData(dataType, ...tickers: string[]) {
     const apiResult = await fetch(`https://fcsapi.com/api-v3/${dataType}/latest?symbol=${searchValue}&exchange=BM%26FBovespa&access_key=${FCS_API_KEY}`).then(r => r.json());
 
     if (apiResult.code !== 200) {
-        throw new Error("API Retornou diferente de 200.\n" + apiResult.code);
+        throw new Error("API Retornou diferente de 200.\n" + apiResult.code + "\n" + apiResult.msg);
     }
     const returnValues = [];
     for (const result of apiResult.response) {
@@ -47,10 +47,14 @@ export async function getStockInfo(tickers: string[]) {
     }
 
     if (tickersToRetrieve.length) {
-        const results = await retrieveData(DataTypeEnum.STOCK, ...tickersToRetrieve);
-        for (const result of results) {
-            stocksCache.set(result.ticker, result);
-            tickersInfo.push(result)
+        try {
+            const results = await retrieveData(DataTypeEnum.STOCK, ...tickersToRetrieve);
+            for (const result of results) {
+                stocksCache.set(result.ticker, result);
+                tickersInfo.push(result)
+            }
+        } catch (e) {
+            console.log(e);
         }
     }
     return tickersInfo.sort((a, b) => { if (a.ticker > b.ticker) return 1; if (b.ticker > a.ticker) return -1; return 0; })
