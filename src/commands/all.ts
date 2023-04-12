@@ -30,7 +30,7 @@ export class MentionAllCommand extends Command {
             }
             this.setLastWarning(key, now);
             await msg.reply("Você não pode marcar todo mundo com tanta frequência!")
-
+            return;
         }
         let text = "";
         let mentions = [];
