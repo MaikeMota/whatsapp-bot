@@ -2,7 +2,7 @@ import { Chat, Client, Message } from "whatsapp-web.js";
 import { Command } from "./command";
 
 import { getStockInfo } from "../services/fcs-api.service";
-import { hasCategorySuffix } from "../utils/ticker.util";
+import { hasCategorySuffix, tickerInfoToOneLineString } from "../utils/ticker.util";
 
 
 export class TickerCommand extends Command {
@@ -54,7 +54,7 @@ export class TickerCommand extends Command {
     }
 
     private getOneLineTickerMessage(tickInfo) {
-        return `${tickInfo.ticker.toUpperCase()}: *R$ ${tickInfo.c.replace('.', ',')}* (${parseFloat(tickInfo.cp) > 0 ? '+' : ''}${tickInfo.cp.replace('.', ',')})`
+        return tickerInfoToOneLineString(tickInfo)
     }
 
     private getTickerMessage(tickInfo, horaAtualizacao) {

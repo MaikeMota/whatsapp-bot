@@ -28,6 +28,7 @@ import { B3UnitsCommand } from './commands/units';
 import { VDACommand } from './commands/vda';
 
 
+import { RadarCommand } from './commands/radar/radar.command';
 import { Runner } from './runners/interfaces/runner.interface';
 import { VDASubscribersNotifyerRunner } from "./runners/vda/VDA-subscribers-notifyer.runner";
 import { VDAViewsNotifyerRunner } from "./runners/vda/VDA-views-notifyer.runner";
@@ -104,7 +105,8 @@ const handlers: Constructor<Command>[] = [
     B3UnitsCommand,
     SelicCommand,
     TrackerCommand,
-    CarteiraCommand
+    CarteiraCommand,
+    RadarCommand
 ]
 
 const runners: Constructor<Runner>[] = [
