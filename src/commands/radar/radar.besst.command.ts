@@ -44,7 +44,7 @@ export class RadarBESSTCommand extends Command {
         }
 
         message.push("\n** As cotações demonstradas possuem até 1 hora de atraso.")
-        msg.reply(message.join("\n"));
+        await msg.reply(message.join("\n"));
     }
 
     get isV2(): boolean {
