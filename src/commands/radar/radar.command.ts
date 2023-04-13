@@ -11,12 +11,14 @@ import { Command } from "../command";
 import { RadarAdicionarCommand } from "./radar.adicionar.command";
 import { RadarBESSTCommand } from "./radar.besst.command";
 import { RadarRemoverCommand } from "./radar.remover.command";
+import { RadarVDACommand } from "./radar.vda.command";
 import { RadarVerCommand } from "./radar.ver.command";
 
 export class RadarCommand extends Command {
     command: string = "/radar";
     subCommands: Command[] = [
         new RadarBESSTCommand(this),
+        new RadarVDACommand(this),
         new RadarVerCommand(this),
         new RadarAdicionarCommand(this),
         new RadarRemoverCommand(this),
