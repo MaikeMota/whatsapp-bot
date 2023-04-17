@@ -36,6 +36,7 @@ import { RadarCommand } from './commands/radar/radar.command';
 import { Runner } from './runners/interfaces/runner.interface';
 import { VDASubscribersNotifyerRunner } from "./runners/vda/VDA-subscribers-notifyer.runner";
 import { VDAViewsNotifyerRunner } from "./runners/vda/VDA-views-notifyer.runner";
+import { randomIntFromInterval } from './utils/util';
 
 const client = new Client({
     authStrategy: new LocalAuth(),
@@ -174,6 +175,13 @@ const handleMessage = async (msg: Message) => {
         if (msg.body.toLowerCase().includes('72h')) {
             if (CHINA_REACTION_GROUPS.includes(chat.id._serialized)) {
                 msg.react("🇧🇷")
+            }
+        }
+
+        if(msg.body.toLowerCase().includes("estorno")){
+            if(CHINA_REACTION_GROUPS.includes(chat.id._serialized)){
+                const reactions = ["🚚", "📬", "📦"];
+                msg.react(reactions[randomIntFromInterval(0, reactions.length - 1)])
             }
         }
 
