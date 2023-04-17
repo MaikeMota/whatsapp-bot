@@ -5,6 +5,10 @@ dotEnvConfig();
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const DUMP_MESSAGE = process.env.DUMP_MESSAGE === 'true';
 
+
+const CHINA_REACTION_GROUPS = process.env.CHINA_REACTION_GROUPS.split(',').map(u => u.trim());
+const JACARE_REACTION_GROUPS = process.env.JACARE_REACTION_GROUPS.split(',').map(u => u.trim());
+
 import * as qrcode from 'qrcode-terminal';
 
 import { Client, LocalAuth, Message } from 'whatsapp-web.js';
@@ -161,12 +165,22 @@ const handleMessage = async (msg: Message) => {
             }
         }
 
-        if(msg.body.toLowerCase().includes('china')){
-            msg.react("🇨🇳")
+        if (msg.body.toLowerCase().includes('china')) {
+            if (CHINA_REACTION_GROUPS.includes(chat.id._serialized)) {
+                msg.react("🇨🇳")
+            }
         }
 
-        if(msg.body.toLowerCase().includes('72h')){
-            msg.react("🇧🇷")
+        if (msg.body.toLowerCase().includes('72h')) {
+            if (CHINA_REACTION_GROUPS.includes(chat.id._serialized)) {
+                msg.react("🇧🇷")
+            }
+        }
+
+        if (msg.body.toLowerCase().includes("mordeu")) {
+            if (JACARE_REACTION_GROUPS.includes(chat.id._serialized)) {
+                msg.react("🐊")
+            }
         }
     }
 
