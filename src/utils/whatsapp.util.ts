@@ -4,3 +4,7 @@ export async function extractContactId(msg: Message): Promise<string> {
     const contact = await msg.getContact();
     return contact?.id?._serialized.replace(/:[0-9]*/, "");
 }
+
+export function isId(possibleId: string): boolean {
+    return possibleId.indexOf("@") >= 0;
+}

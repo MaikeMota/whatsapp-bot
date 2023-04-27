@@ -6,8 +6,19 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const DUMP_MESSAGE = process.env.DUMP_MESSAGE === 'true';
 
 
-const CHINA_REACTION_GROUPS = process.env.CHINA_REACTION_GROUPS.split(',').map(u => u.trim());
-const JACARE_REACTION_GROUPS = process.env.JACARE_REACTION_GROUPS.split(',').map(u => u.trim());
+interface MessageReaction {
+    keywords: string[];
+    reactions: string[];
+    allowedGroups: string[];
+}
+
+interface ChatGroups { 
+    name: string;
+    ids: string[];
+}
+
+const CHATGROUPS: ChatGroups[] = JSON.parse(process.env.CHATGROUPS);
+const REACTIONS: MessageReaction[] = JSON.parse(process.env.REACTIONS);
 
 import * as qrcode from 'qrcode-terminal';
 
@@ -37,6 +48,7 @@ import { Runner } from './runners/interfaces/runner.interface';
 import { VDASubscribersNotifyerRunner } from "./runners/vda/VDA-subscribers-notifyer.runner";
 import { VDAViewsNotifyerRunner } from "./runners/vda/VDA-views-notifyer.runner";
 import { randomIntFromInterval } from './utils/util';
+import { isId } from './utils/whatsapp.util';
 
 const client = new Client({
     authStrategy: new LocalAuth(),
@@ -166,42 +178,24 @@ const handleMessage = async (msg: Message) => {
             }
         }
 
-        if (msg.body.toLowerCase().includes('china')) {
-            if (CHINA_REACTION_GROUPS.includes(chat.id._serialized)) {
-                msg.react("🇨🇳")
-            }
-        }
-
-        if (msg.body.toLowerCase().includes('72h')) {
-            if (CHINA_REACTION_GROUPS.includes(chat.id._serialized)) {
-                msg.react("🇧🇷")
-            }
-        }
-
-        if(msg.body.toLowerCase().includes("estorno")){
-            if(CHINA_REACTION_GROUPS.includes(chat.id._serialized)){
-                const reactions = ["🚚", "📬", "📦"];
-                msg.react(reactions[randomIntFromInterval(0, reactions.length - 1)])
-            }
-        }
-
-        if(["olavo", "olavo de carvalho", "olavinho"].includes(msg.body.toLocaleLowerCase())){ 
-            if(CHINA_REACTION_GROUPS.includes(chat.id._serialized)){
-                const reactions = ["💀", "☠️", "🩻"];
-                msg.react(reactions[randomIntFromInterval(0, reactions.length - 1)])
-            }
-        }
-
-        if(["magic"].includes(msg.body.toLocaleLowerCase())){ 
-            if(CHINA_REACTION_GROUPS.includes(chat.id._serialized)){
-                const reactions = ["🧙‍♀️","🃏","🪄"];
-                msg.react(reactions[randomIntFromInterval(0, reactions.length - 1)])
-            }
-        }        
-
-        if (msg.body.toLowerCase().includes("mordeu")) {
-            if (JACARE_REACTION_GROUPS.includes(chat.id._serialized)) {
-                msg.react("🐊")
+        const textMessage = msg.body.toLowerCase();
+        for (const reaction of REACTIONS) {
+            for (const keyworkd of reaction.keywords) {
+                if (textMessage.includes(keyworkd)) {
+                    for (const allowedGroup of reaction.allowedGroups) {
+                        let shouldReact = false;
+                        if (isId(allowedGroup)) {
+                            shouldReact = chat.id._serialized === allowedGroup;
+                        } else {
+                            const chatList = CHATGROUPS.find(chatGroup => chatGroup.name === allowedGroup)
+                            shouldReact = !!chatList && chatList.ids.includes(chat.id._serialized);
+                        }
+                        if (shouldReact) {
+                            const randomReaction = reaction.reactions[randomIntFromInterval(0, reaction.reactions.length - 1)];
+                            await msg.react(randomReaction);
+                        }
+                    }
+                }
             }
         }
     }
@@ -227,3 +221,4 @@ async function shutdown(event) {
     await Promise.all(shutdownSequences);
     await client.destroy();
 }
+
