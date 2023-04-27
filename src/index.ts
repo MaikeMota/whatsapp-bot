@@ -186,14 +186,14 @@ const handleMessage = async (msg: Message) => {
         }
 
         if(["olavo", "olavo de carvalho", "olavinho"].includes(msg.body.toLocaleLowerCase())){ 
-            if(CHINA_REACTION_GROUPS.includes(chat.id._serialized))){
+            if(CHINA_REACTION_GROUPS.includes(chat.id._serialized)){
                 const reactions = ["💀", "☠️", "🩻"];
                 msg.react(reactions[randomIntFromInterval(0, reactions.length - 1)])
             }
         }
 
         if(["magic"].includes(msg.body.toLocaleLowerCase())){ 
-            if(CHINA_REACTION_GROUPS.includes(chat.id._serialized))){
+            if(CHINA_REACTION_GROUPS.includes(chat.id._serialized)){
                 const reactions = ["🧙‍♀️","🃏","🪄"];
                 msg.react(reactions[randomIntFromInterval(0, reactions.length - 1)])
             }
