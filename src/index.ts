@@ -192,7 +192,7 @@ const handleMessage = async (msg: Message) => {
                         }
                         if (shouldReact) {
                             const randomReaction = reaction.reactions[randomIntFromInterval(0, reaction.reactions.length - 1)];
-                            await msg.react(randomReaction);
+                            return await msg.react(randomReaction);
                         }
                     }
                 }
