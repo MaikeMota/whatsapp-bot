@@ -1,5 +1,7 @@
 import { Chat, Client, Message } from "whatsapp-web.js";
 import { getChannelStatistics } from "../services/youtube.service";
+import { StateSaver } from "../utils/interfaces/state-save.interface";
+import { JSONStateSaver } from "../utils/json-state-saver";
 import { Command } from "./command";
 
 const { getLatestVideo  } = require('../services/youtube.service');
@@ -11,6 +13,9 @@ const LINKS_SUBCOMMANDS = ["links", "merch"]
 const AVAILABLE_SUBCOMMANDS = [...VIDEO_SUBCOMMANDS, ...INSCRITOS_SUBCOMMANDS, ...LINKS_SUBCOMMANDS]
 
 export class VDACommand extends Command {
+
+    private statusSaver: StateSaver<Array<string>> = new JSONStateSaver<Array<string>>();
+
     command = '/vda';
     alternativeCommands = ['/vidacionista'];
     usageDescription = "";
@@ -57,24 +62,8 @@ export class VDACommand extends Command {
     }
 
     private async handlePromotionalLinks(msg) {
-        await msg.reply(`🐊 Assine a plataforma AGF+ com 20% de desconto: http://bit.ly/3JTkcQ7
-    
-    Considere comprar um dos livros recomendados pelos links abaixo:
-    
-    📚 O rei dos dividendos: A saga do filho de imigrantes pobres que se tornou o maior investidor pessoa física da bolsa de valores brasileira: https://amzn.to/3EUcWm4
-    📚 A psicologia financeira: lições atemporais sobre fortuna, ganância e felicidade - Morgan Housel: https://amzn.to/3c2HjdT (livro físico) ou https://amzn.to/3NTn3Z6 (ebook)
-    📚 O mercado de ações em 25 episódios - Paulo Portinho: https://amzn.to/3PhdZyN
-    📚 Faça Fortuna com Ações, Antes que seja Tarde - Décio Bazin: https://amzn.to/3OhjPPq
-    📚 O Investidor em Ações de Dividendos - Orleans Martins: https://amzn.to/3AYUN4F
-    📚 O Mais Importante para o Investidor - Howard Marks: https://amzn.to/3PCniJz
-    📚 O jeito Warren Buffett de investir - Robert G. Hagstrom: https://amzn.to/3zdugzo
-    📚 A bola de neve: Warren Buffett e o negócio da vida - Alice Schroeder: https://amzn.to/3Oi95Aj
-    📚 O investidor de bom senso - John C. Bogle: https://amzn.to/3Pk8zDo
-    📚 Investindo em Ações no Longo Prazo - Jeremy Siegel: https://amzn.to/3ob9mdJ
-    📚 O investidor inteligente - Benjamin Graham: https://amzn.to/3oj8sMd
-    📚 Os segredos da mente milionária - T. Harv Eker: https://amzn.to/3BgpPp1
-    📚 Pai Rico, Pai Pobre - Robert T. Kiyosaki: https://amzn.to/3B1PH7W
-    `)
+        const links = await this.statusSaver.load("./vda/links");
+        await msg.reply(links.join("\n"))
     }
 
 }
