@@ -21,6 +21,12 @@ export class RadarRemoverCommand extends Command {
     }
 
     async handle(client: Client, chat: Chat, msg: Message, ...tickers: string[]): Promise<void> {
+        if (chat.id._serialized !== "120363159731656783@g.us") {
+            msg.reply(`Este comando está disponível apenas para o grupo BOT VDA.
+    *Acesse o link abaixo para entrar no grupo:*
+        https://chat.whatsapp.com/FmBQj0c6hrt8Ko8JdN24PL`)
+            return;
+        }
 
         const contactId = await extractContactId(msg);
         const key = RadarUtil.getStateKey(contactId);

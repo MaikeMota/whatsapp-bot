@@ -16,8 +16,8 @@ export class RadarAdicionarCommand extends Command {
     private stateSaver: StateSaver<RadarSaveState> = new JSONStateSaver<RadarSaveState>();
 
     protected async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
-        const [ticker] = argsArray;
-        return !!ticker && hasCategorySuffix(ticker);
+        const [ticker] = argsArray.filter(t => !!t);
+        return !!ticker && hasCategorySuffix(ticker.trim());
     }
 
     async handle(client: Client, chat: Chat, msg: Message, ...tickers: string[]): Promise<void> {
@@ -33,7 +33,7 @@ export class RadarAdicionarCommand extends Command {
         const withoutSuffix = []
         const added = []
         const alreadyExists = [];
-        for (const ticker of tickers.map(t => t.toUpperCase())){
+        for (const ticker of tickers.filter(t => !!t).map(t => t.toUpperCase())){
 
             if (!hasCategorySuffix(ticker)) {
                 withoutSuffix.push(ticker);

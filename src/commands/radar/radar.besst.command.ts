@@ -25,9 +25,15 @@ export class RadarBESSTCommand extends Command {
     private lastLoadedState: Array<string[]>;
     private lastLoadedTime: number = 0;
 
-    
+
 
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
+        if (chat.id._serialized !== "120363159731656783@g.us") {
+            msg.reply(`Este comando está disponível apenas para o grupo BOT VDA.
+    *Acesse o link abaixo para entrar no grupo:*
+        https://chat.whatsapp.com/FmBQj0c6hrt8Ko8JdN24PL`)
+            return;
+        }
         const currState = await this.getState();
 
         const tickers = currState.flat();
@@ -37,9 +43,9 @@ export class RadarBESSTCommand extends Command {
         const message = []
         for (const sector of currState) {
             message.push(`*${BESST[counter++]}*`);
-            for(const ticker of sector) {
+            for (const ticker of sector) {
                 const info = tickersInfo.find(ti => ti.ticker === ticker);
-                if(!info){ 
+                if (!info) {
                     console.log(`[RadarBesstCommand] Could not find info for ticker ${ticker}`)
                     continue
                 }
@@ -52,7 +58,7 @@ export class RadarBESSTCommand extends Command {
     }
 
     private async getState(): Promise<Array<string[]>> {
-        if (!this.lastLoadedState || Date.now() - this.lastLoadedTime  > CACHE_TIME) {
+        if (!this.lastLoadedState || Date.now() - this.lastLoadedTime > CACHE_TIME) {
             this.lastLoadedState = await this.stateSaver.load("./radar/besst");
             this.lastLoadedTime = Date.now();
         }
