@@ -11,7 +11,7 @@ export abstract class Command {
     alternativeCommands: string[] = [];
     subCommands?: Command[] = [];
     parentCommand?: Command;
-    usageDescription?: string;
+    usageDescription?: string | string[];
 
     async isUsageValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
         const [command] = argsArray;
@@ -28,14 +28,14 @@ export abstract class Command {
     protected async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
         return true;
     }
-    
+
     async handle(client: Client, chat: Chat, msg: Message, ...[command, ...argsArray]: string[]): Promise<void> {
-        if(this.hasSubCommands){ 
+        if (this.hasSubCommands) {
             const subCommand = this.subCommands.find(subCommand => subCommand.command === command || subCommand.alternativeCommands.includes(command))
             if (subCommand) {
                 await subCommand.handle(client, chat, msg, ...argsArray);
             }
-        }        
+        }
     }
 
     get isV2(): boolean {
@@ -54,7 +54,10 @@ export abstract class Command {
         if (this.hasSubCommands) {
             return this.subCommands?.map(subCommand => `${this.command} ${subCommand.usage}`).join('\n');
         }
-        return `${this.command} ${this.usageDescription}`;
+        if (typeof this.usageDescription === 'string') {
+            return `${this.command} ${this.usageDescription}`
+        }
+        return `${this.command} ${this.usageDescription.join(`\n${this.parentCommand.command} ${this.command} `)}`;
     }
 
 }
