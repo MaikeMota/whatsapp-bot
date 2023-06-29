@@ -5,6 +5,8 @@ dotEnvConfig();
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const DUMP_MESSAGE = process.env.DUMP_MESSAGE === 'true';
 
+const WCLIENT_ID = process.env.WCLIENT_ID || IS_PRODUCTION ? "PROD_CLIENT" : "DEV_CLIENT";
+
 
 interface MessageReaction {
     keywords: string[];
@@ -43,15 +45,17 @@ import { B3UnitsCommand } from './commands/units';
 import { VDACommand } from './commands/vda';
 
 
+import { CatalogoCommand } from './commands/catalogo.command';
 import { RadarCommand } from './commands/radar/radar.command';
 import { Runner } from './runners/interfaces/runner.interface';
-import { VDASubscribersNotifyerRunner } from "./runners/vda/VDA-subscribers-notifyer.runner";
-import { VDAViewsNotifyerRunner } from "./runners/vda/VDA-views-notifyer.runner";
 import { randomIntFromInterval } from './utils/util';
 import { isId } from './utils/whatsapp.util';
 
+
+const clientOptions = { }
+
 const client = new Client({
-    authStrategy: new LocalAuth(),
+    authStrategy: new LocalAuth({ clientId: IS_PRODUCTION? WCLIENT_ID: undefined, dataPath: IS_PRODUCTION? "/app/auth_data": undefined }),
     puppeteer: {
         args: ['--no-sandbox'],
     }
@@ -123,12 +127,13 @@ const handlers: Constructor<Command>[] = [
     SelicCommand,
     TrackerCommand,
     CarteiraCommand,
-    RadarCommand
+    RadarCommand,
+    CatalogoCommand
 ]
 
 const runners: Constructor<Runner>[] = [
-    VDASubscribersNotifyerRunner,
-    VDAViewsNotifyerRunner
+    // VDASubscribersNotifyerRunner,
+    // VDAViewsNotifyerRunner
 ];
 
 const registerCommand = (command: string, handler: Command, handlers: CommandMap) => {
