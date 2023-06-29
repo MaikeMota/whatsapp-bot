@@ -1,5 +1,6 @@
 import { Chat, Client, Message } from "whatsapp-web.js";
-import { getStockInfo } from "../../services/fcs-api.service";
+import { getStockInfo } from "../../services/brapi.service";
+import { StockInfo } from "../../services/stock-info.interface";
 import { StateSaver } from "../../utils/interfaces/state-save.interface";
 import { JSONStateSaver } from "../../utils/json-state-saver";
 import { tickerInfoToOneLineString } from "../../utils/ticker.util";
@@ -16,7 +17,7 @@ const CACHE_TIME = 1000 * 60 * parseInt((process.env.RADAR_BESST_COMMAND_INTERVA
 
 export class RadarBESSTCommand extends Command {
     command: string = "besst";
-    alternativeCommands: string[] = ["BESST"];
+    alternativeCommands: string[] = ["BESST", "best"];
 
     usageDescription = "\t-> Mostra a cotações das principais empresas do BESST"
 
@@ -37,16 +38,19 @@ export class RadarBESSTCommand extends Command {
         const message = []
         for (const sector of currState) {
             message.push(`*${BESST[counter++]}*`);
-            for(const ticker of sector) {
-                const info = tickersInfo.find(ti => ti.ticker === ticker);
-                if(!info){ 
+            const stockInfos: StockInfo[] = []
+            for (const ticker of sector) {
+                const info = tickersInfo.success.find(ti => ti.ticker === ticker);
+                if (!info) {
                     console.log(`[RadarBesstCommand] Could not find info for ticker ${ticker}`)
                     continue
                 }
-                message.push("\t" + tickerInfoToOneLineString(info));
+                stockInfos.push(info)
             }
+            stockInfos
+                .sort((a, b) => a.dailyChangeInPercent - b.dailyChangeInPercent)
+                .forEach(info => message.push("\t" + tickerInfoToOneLineString(info)));
         }
-
         message.push("\n** As cotações demonstradas possuem até 1 hora de atraso.")
         await msg.reply(message.join("\n"));
     }

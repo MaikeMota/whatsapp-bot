@@ -4,7 +4,7 @@ import { JSONStateSaver } from "../utils/json-state-saver";
 import { Command } from "./command";
 
 import { formatToBRL, formatToNumber, parseToNumber } from "brazilian-values";
-import { getStockInfo } from "../services/fcs-api.service";
+import { getStockInfo } from "../services/brapi.service";
 import { calcularNovaPosicao, getPercentualDiff } from "../utils/math.utils";
 import { asPercentageString } from "../utils/string.utils";
 import { hasCategorySuffix } from "../utils/ticker.util";
@@ -97,9 +97,9 @@ export class CarteiraCommand extends Command {
             if (!ticker) {
                 const cotacoes = await getStockInfo(Object.keys(wallet))
                 for (const [ticker, position] of Object.entries(wallet)) {
-                    const { c } = cotacoes.find(c => c.ticker === ticker);
-                    const percentDiff = getPercentualDiff(position.precoMedio, c)
-                    msgs.push(`*[${ticker}] ${formatToBRL(c)}*
+                    const { price } = cotacoes.success.find(c => c.ticker === ticker);
+                    const percentDiff = getPercentualDiff(position.precoMedio, price)
+                    msgs.push(`*[${ticker}] ${formatToBRL(price)}*
     _Quantidade_:      ${formatToNumber(position.quantidade)}
     _Preço Médio_:     ${formatToBRL(position.precoMedio)} *(${asPercentageString(percentDiff)})*
     _DPA Proj_.:       ${formatToBRL(position.dpaProjetivo)}
@@ -257,14 +257,15 @@ export class CarteiraCommand extends Command {
 
             const [VALOR_APORTE, ORDENADO_POR, TOP_N] = argsArray;
             const valorAporte = parseToNumber(VALOR_APORTE);
-            const campoOrdenacao = ORDENADO_POR; // TODO: Bloquear a operação se o campo não existir
+            const campoOrdenacao = ORDENADO_POR || "dyAporte"; // TODO: Bloquear a operação se o campo não existir
             const topN = parseToNumber(TOP_N || `3`);
 
             interface ResultadoSimulacao {
                 cotacao: number;
                 quantidadeParaComprar: number;
                 proventosEsperadosTotal: number;
-                dyTotal: number;
+                yoc: number;
+                yocNovo: number;
                 proventosEsperadoDesteAporte: number;
                 dyAporte: number;
                 posicaoFinal: number;
@@ -283,11 +284,11 @@ export class CarteiraCommand extends Command {
 
             for (const [key, value] of Object.entries(wallet)) {
 
-                const infoCotacao = cotacoes.find((cotacaoInfo) => cotacaoInfo.ticker === key);
+                const infoCotacao = cotacoes.success.find((cotacaoInfo) => cotacaoInfo.ticker === key);
                 if (!infoCotacao) {
                     continue;
                 }
-                value.cotacao = parseFloat(infoCotacao.c);
+                value.cotacao = infoCotacao.price;
 
                 const quantidadeParaComprar = Math.floor(valorAporte / value.cotacao);
 
@@ -304,14 +305,19 @@ export class CarteiraCommand extends Command {
                 const totalAportado = quantidadeParaComprar * value.cotacao;
 
                 const { novaQuantidade: posicaoFinal, novoPrecoMedio } = calcularNovaPosicao(value.precoMedio, value.quantidade, value.cotacao, quantidadeParaComprar)
-
-                const dyTotal = (((((value.dpaProjetivo / value.precoMedio) * patrimonioTotal) + ((proventosPendentes / value.cotacao) * totalAportado)) / (patrimonioTotal + totalAportado)) * 100);
+                                        //                   (377,71      +    1163,5) / 16029,9
+                                        //          (0,1247    * 3029    +  0,0895 * 13000 ) / 16029,9
+                                       //    (((4.61 / 36.95) * 3029.9) + ((3.89 / 43.43) * 13000)) / (3029.9 + 13000)
+                const yoc = (value.dpaProjetivo / value.precoMedio)  * 100;
+                const yocNovo = (value.dpaProjetivo / novoPrecoMedio)  * 100;
+               
 
                 simulacao[key] = {
                     cotacao: value.cotacao,
                     quantidadeParaComprar,
                     proventosEsperadosTotal,
-                    dyTotal,
+                    yoc,
+                    yocNovo,
                     proventosEsperadoDesteAporte,
                     dyAporte,
                     posicaoFinal,
@@ -325,8 +331,9 @@ export class CarteiraCommand extends Command {
             const mappedValues = entries.flatMap(([key, value]) => { return { ativo: key, ...value } })
             mappedValues.sort((valueA, valueB) => { return valueB[campoOrdenacao] - valueA[campoOrdenacao] });
             const msgs = mappedValues.filter((i, index) => index < topN)
-                .map(({ cotacao, ativo, totalAportado, posicaoFinal, novoPrecoMedio, precoMedioAntigo, quantidadeParaComprar, proventosEsperadoDesteAporte, dyAporte, proventosEsperadosTotal, dyTotal }) => {
+                .map(({ cotacao, ativo, totalAportado, posicaoFinal, novoPrecoMedio, precoMedioAntigo, quantidadeParaComprar, proventosEsperadoDesteAporte, dyAporte, proventosEsperadosTotal, yoc, yocNovo }) => {
                     const novoPmPercent = ((novoPrecoMedio - precoMedioAntigo) / precoMedioAntigo) * 100;
+                    const yocNovoPercent = ((yocNovo - yoc  ) / yoc) * 100;
                     return `[${ativo} - ${formatToBRL(cotacao)}] 
     Capacidade Compra > ${quantidadeParaComprar.toString().padStart(4, ' ')}
     Total Aportado    > ${formatToBRL(totalAportado)} (${((totalAportado / valorAporte) * 100).toLocaleString('pt-BR')}%)
@@ -336,7 +343,7 @@ export class CarteiraCommand extends Command {
     Proventos Aporte  > ${formatToBRL(proventosEsperadoDesteAporte)}
     DY Aporte         > ${dyAporte.toLocaleString('pt-BR').padStart(5, ' ')}%
     Proventos Totais  > ${formatToBRL(proventosEsperadosTotal)}
-    DY final          > ${dyTotal.toLocaleString('pt-BR').padStart(5, ' ')}%`
+    DY final          > ${yoc.toLocaleString('pt-BR').padStart(5, ' ')}% -> ${yocNovo.toLocaleString('pt-BR').padStart(5, ' ')}% (${yocNovoPercent > 0 ? '+' : ''}${yocNovoPercent.toFixed(2)}%)`
                 })
             await msg.reply(`= TOP ${topN} para ${campoOrdenacao} =`)
             await chat.sendMessage(msgs.join('\n\n'));

@@ -19,7 +19,7 @@
 import { Chat, Client, Message } from "whatsapp-web.js";
 import { Command } from "./command";
 
-import { getStockInfo } from "../services/fcs-api.service";
+import { getStockInfo } from "../services/brapi.service";
 
 import unitsInfo from '../data/units-b3.json';
 
@@ -96,9 +96,9 @@ export class B3UnitsCommand extends Command {
         const tickerPn = `${unitName.replace('11', '').toUpperCase()}4`;
 
         const tickersPrices = await getStockInfo([unitNameWithSufix, tickerOn, tickerPn]);
-        const unitPrice = parseFloat(tickersPrices.find(t => t.ticker === unitNameWithSufix).c);
-        const onPrice = parseFloat(tickersPrices.find(t => t.ticker === tickerOn).c);
-        const pnPrice = parseFloat(tickersPrices.find(t => t.ticker === tickerPn).c);
+        const unitPrice = tickersPrices.success.find(t => t.ticker === unitNameWithSufix).price;
+        const onPrice = tickersPrices.success.find(t => t.ticker === tickerOn).price;
+        const pnPrice = tickersPrices.success.find(t => t.ticker === tickerPn).price;
 
         unitInfo.atualizarPrecos(unitPrice, onPrice, pnPrice);
 

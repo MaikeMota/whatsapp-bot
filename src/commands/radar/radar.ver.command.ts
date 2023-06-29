@@ -1,5 +1,6 @@
 import { Chat, Client, Message } from "whatsapp-web.js";
-import { getStockInfo } from "../../services/fcs-api.service";
+import { getStockInfo } from "../../services/brapi.service";
+import { StockInfo } from "../../services/stock-info.interface";
 import { StateSaver } from "../../utils/interfaces/state-save.interface";
 import { JSONStateSaver } from "../../utils/json-state-saver";
 import { tickerInfoToOneLineString } from "../../utils/ticker.util";
@@ -28,18 +29,20 @@ export class RadarVerCommand extends Command {
 
         const tickersInfo = await getStockInfo(currentState.tickers);
         const message = ["Cotações das empresas do seu Radar:\n"]
-        const notFound = []
+        const stockInfos: StockInfo[] = []
         for (const ticker of currentState.tickers) {
-            const info = tickersInfo.find(ti => ti.ticker === ticker.toUpperCase());
+            const info = tickersInfo.success.find(ti => ti.ticker === ticker.toUpperCase());
             if (!info) {
-                notFound.push(ticker);
                 continue;
             }
-            message.push("\t" + tickerInfoToOneLineString(info));
+            stockInfos.push(info)
         }
+        stockInfos
+            .sort((a, b) => a.dailyChangeInPercent - b.dailyChangeInPercent)
+            .forEach(info => message.push("\t" + tickerInfoToOneLineString(info)));
 
-        if (notFound.length > 0) {
-            message.push("\nNão foi possível recuperar as cotações dos seguintes tickers: " + notFound.join(", "))
+        if (tickersInfo.failed.length > 0) {
+            message.push("\nNão foi possível recuperar as cotações dos seguintes tickers: " + tickersInfo.failed.join(", "))
         }
 
         message.push("\n** As cotações demonstradas possuem até 1 hora de atraso.")
