@@ -10,6 +10,7 @@ import { Command } from "../command";
 
 import { RadarAdicionarCommand } from "./radar.adicionar.command";
 import { RadarBESSTCommand } from "./radar.besst.command";
+import { RadarPreferidasCommand } from "./radar.preferidas.command";
 import { RadarRemoverCommand } from "./radar.remover.command";
 import { RadarVDACommand } from "./radar.vda.command";
 import { RadarVerCommand } from "./radar.ver.command";
@@ -22,6 +23,7 @@ export class RadarCommand extends Command {
         new RadarVerCommand(this),
         new RadarAdicionarCommand(this),
         new RadarRemoverCommand(this),
+        new RadarPreferidasCommand(this)
     ]; 
 
     get isV2(): boolean {
