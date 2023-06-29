@@ -23,10 +23,12 @@ services:
       - CARTEIRA_COMMAND_ALLOWED_CHATS=${CARTEIRA_COMMAND_ALLOWED_CHATS}      
       - REACTIONS=${REACTIONS}
       - CHATGROUPS=${CHATGROUPS}
+      - RADAR_PREFERIDAS_UPDATE_IN_HOURS=${RADAR_PREFERIDAS_UPDATE_IN_HOURS}
+      - WCLIENT_ID=${WCLIENT_ID}
     volumes:
       - type: bind
         source: ${AUTH_FOLDER}
-        target: /app/.wwebjs_auth
+        target: /app/auth_data
       - type: bind
         source: ${HOST_TEMP_FOLDER}
         target: /app/tmp
