@@ -58,7 +58,6 @@ const client = new Client({
     }
 });
 
-
 client.on('auth_failure', console.log)
 client.on('loading_screen', console.log)
 
