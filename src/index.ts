@@ -28,7 +28,7 @@ import { Client, LocalAuth, Message } from 'whatsapp-web.js';
 import { Command } from './commands/command';
 import { Constructor } from './utils/constructor';
 
-import { MentionAllAdminsCommand } from './commands/adms';
+import { MentionAllAdminsCommand } from './commands/adminstrative/adms';
 import { MentionAllCommand } from './commands/all';
 import { CarteiraCommand } from './commands/carteira';
 import { CriptoCommand } from './commands/cripto';
@@ -44,7 +44,9 @@ import { B3UnitsCommand } from './commands/units';
 import { VDACommand } from './commands/vda';
 
 
+import { GroupAdminCommand } from './commands/adminstrative/group-admin.command';
 import { RadarCommand } from './commands/radar/radar.command';
+import { GroupAdminUnlockerRunner } from './runners/group-admin/unlocker.runner';
 import { Runner } from './runners/interfaces/runner.interface';
 import { VDASubscribersNotifyerRunner } from "./runners/vda/VDA-subscribers-notifyer.runner";
 import { VDAViewsNotifyerRunner } from "./runners/vda/VDA-views-notifyer.runner";
@@ -123,12 +125,14 @@ const handlers: Constructor<Command>[] = [
     SelicCommand,
     TrackerCommand,
     CarteiraCommand,
-    RadarCommand
+    RadarCommand,
+    GroupAdminCommand
 ]
 
 const runners: Constructor<Runner>[] = [
     VDASubscribersNotifyerRunner,
-    VDAViewsNotifyerRunner
+    VDAViewsNotifyerRunner,
+    GroupAdminUnlockerRunner
 ];
 
 const registerCommand = (command: string, handler: Command, handlers: CommandMap) => {
@@ -152,6 +156,8 @@ const RegisteredHandlers: CommandMap = {}
 const handleMessage = async (msg: Message) => {
 
     const chat = await msg.getChat();
+
+    if (msg.isStatus) { return; }
 
     console.info(`Received message from ${msg['_data'].notifyName} at ${chat.name}: `);
 

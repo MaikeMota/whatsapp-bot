@@ -1,5 +1,5 @@
 import { Client, GroupChat, Message } from "whatsapp-web.js";
-import { Command } from "./command";
+import { Command } from "../command";
 
 export class MentionAllAdminsCommand extends Command {
     command = '@admin';
