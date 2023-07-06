@@ -33,6 +33,17 @@ export async function getStockInfo(tickers: string[]): Promise<TickerRequestResu
 
 }
 
+export async function getAvailableTickersFor(prefix: string): Promise<string[]> {
+    const apiResult = await fetch(`https://brapi.dev/api/available?search=${prefix}`)
+        .then(r => r.json() as Promise<BRAPITickerAvailablesResponse>);
+    return apiResult.stocks.filter(s => !s.toLowerCase().endsWith("f"));
+}
+
+interface BRAPITickerAvailablesResponse {
+    indexes: string[];
+    stocks: string[];
+}
+
 interface TickerRequestResult {
     success: StockInfo[];
     failed: string[];
