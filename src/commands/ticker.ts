@@ -32,6 +32,11 @@ export class TickerCommand extends Command {
             argsArray = [...argsArray.filter(a => a !== ticker), ...tickersToAdd]
         }
 
+        if(!argsArray.length) {
+            msg.reply(`Não consegui nenhum ticker com o prefixo *${ticker}*`);
+            return;
+        }
+
         const isMultiple = argsArray.length > 1
 
         if (isMultiple) {
