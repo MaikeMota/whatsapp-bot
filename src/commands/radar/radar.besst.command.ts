@@ -3,7 +3,7 @@ import { getStockInfo } from "../../services/brapi.service";
 import { StockInfo } from "../../services/stock-info.interface";
 import { StateSaver } from "../../utils/interfaces/state-save.interface";
 import { JSONStateSaver } from "../../utils/json-state-saver";
-import { tickerInfoToOneLineString } from "../../utils/ticker.util";
+import { sortByMostNegativeDailyChange, tickerInfoToOneLineString } from "../../utils/ticker.util";
 import { Command } from "../command";
 
 const BESST = [
@@ -54,7 +54,7 @@ export class RadarBESSTCommand extends Command {
                 stockInfos.push(info)
             }
             stockInfos
-                .sort((a, b) => a.dailyChangeInPercent - b.dailyChangeInPercent)
+                .sort(sortByMostNegativeDailyChange)
                 .forEach(info => message.push("\t" + tickerInfoToOneLineString(info)));
         }
         message.push("\n** As cotações demonstradas possuem até 1 hora de atraso.")
