@@ -48,10 +48,10 @@ export class TickerCommand extends Command {
         }
 
         const [args] = argsArray;
-        const ticksInfo = await getStockInfo([ticker]);
+        const ticksInfo = await getStockInfo([args]);
         const tickInfo = ticksInfo.success[0];
         if (!tickInfo) {
-            msg.reply(`Não consegui encontrar informações sobre o preço de ${ticker}`);
+            msg.reply(`Não consegui encontrar informações sobre o preço de ${args}`);
             return;
         }
         await msg.reply(this.getTickerMessage(tickInfo));
