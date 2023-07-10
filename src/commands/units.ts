@@ -72,7 +72,7 @@ class B3UnitInfo implements B3Unit {
 
 export class B3UnitsCommand extends Command {
     command: string = "/unit";
-    
+
     usageDescription: string = "<nome da unit> - Recupera informações sobre a unit informada. Ex: /unit TAEE11";
 
     async isUsageValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
@@ -82,34 +82,34 @@ export class B3UnitsCommand extends Command {
 
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]) {
 
-        const [unitName] = argsArray;
+        let [unitName] = argsArray;
 
-        let unitNameWithSufix = normalizeUnitName(unitName);
-        const unitInfo: B3UnitInfo = getB3UnitInfo(unitNameWithSufix);
+        unitName = normalizeUnitName(unitName);
+        const unitInfo: B3UnitInfo = getB3UnitInfo(unitName);
 
         if (!unitInfo) {
-            await msg.reply(`Não tenho informações sobre a Unit Solicitada (${unitNameWithSufix})`);
+            await msg.reply(`Não tenho informações sobre a Unit Solicitada (${unitName})`);
             return;
         }
 
         const tickerOn = `${unitName.replace('11', '').toUpperCase()}3`;
         const tickerPn = `${unitName.replace('11', '').toUpperCase()}4`;
 
-        const tickersPrices = await getStockInfo([unitNameWithSufix, tickerOn, tickerPn]);
-        const unitPrice = tickersPrices.success.find(t => t.ticker === unitNameWithSufix).price;
+        const tickersPrices = await getStockInfo([unitName, tickerOn, tickerPn]);
+        const unitPrice = tickersPrices.success.find(t => t.ticker === unitName).price;
         const onPrice = tickersPrices.success.find(t => t.ticker === tickerOn).price;
         const pnPrice = tickersPrices.success.find(t => t.ticker === tickerPn).price;
 
         unitInfo.atualizarPrecos(unitPrice, onPrice, pnPrice);
 
         const whatToBuy = unitInfo.qualClasseComprar();
-        const whatToBuyTicker = getTickerBasedOnStockType(whatToBuy, tickerOn, tickerPn, unitNameWithSufix);
+        const whatToBuyTicker = getTickerBasedOnStockType(whatToBuy, tickerOn, tickerPn, unitName);
 
-        await msg.reply(`${unitInfo.nome} (${unitNameWithSufix})
-1 *${unitNameWithSufix}* = ${unitInfo.qtdOn} *${tickerOn}* + ${unitInfo.qtdPn} *${tickerPn}*
+        await msg.reply(`${unitInfo.nome} (${unitName})
+1 *${unitName}* = ${unitInfo.qtdOn} *${tickerOn}* + ${unitInfo.qtdPn} *${tickerPn}*
 
 *Cotações:*
-${unitNameWithSufix}: R$ ${unitInfo.precoUnit.toString().replace('.', ',')}
+${unitName}: R$ ${unitInfo.precoUnit.toString().replace('.', ',')}
 ${tickerOn}: R$ ${unitInfo.precoOn.toString().replace('.', ',')}
 ${tickerPn}: R$ ${unitInfo.precoPn.toString().replace('.', ',')}
 
@@ -165,7 +165,7 @@ function getTickerBasedOnStockType(type: TipoAcao, tickerOn: string, tickerPn: s
 function normalizeUnitName(unit: string) {
     unit = unit.toUpperCase();
     if (!unit.endsWith('11')) {
-        unit += '11';
+        unit = unit.replaceAll(/[~0-9]*/g, '') + '11';
     }
     return unit;
 }
