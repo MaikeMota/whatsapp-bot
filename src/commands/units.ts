@@ -72,7 +72,7 @@ class B3UnitInfo implements B3Unit {
 
 export class B3UnitsCommand extends Command {
     command: string = "/unit";
-    
+
     usageDescription: string = "<nome da unit> - Recupera informações sobre a unit informada. Ex: /unit TAEE11";
 
     async isUsageValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
@@ -165,7 +165,7 @@ function getTickerBasedOnStockType(type: TipoAcao, tickerOn: string, tickerPn: s
 function normalizeUnitName(unit: string) {
     unit = unit.toUpperCase();
     if (!unit.endsWith('11')) {
-        unit += '11';
+        unit = unit.replaceAll(/[~0-9]*/g, '') + '11';
     }
     return unit;
 }
