@@ -187,24 +187,25 @@ const handleMessage = async (msg: Message) => {
         const textMessage = msg.body.toLowerCase();
         for (const reaction of REACTIONS) {
             for (const keyworkd of reaction.keywords) {
-                if (textMessage.includes(keyworkd)) {
-                    for (const allowedGroup of reaction.allowedGroups) {
-                        let shouldReact = false;
-                        if (isId(allowedGroup)) {
-                            shouldReact = chat.id._serialized === allowedGroup;
-                        } else {
-                            const chatList = CHATGROUPS.find(chatGroup => chatGroup.name === allowedGroup)
-                            shouldReact = !!chatList && chatList.ids.includes(chat.id._serialized);
-                        }
-                        if (shouldReact) {
-                            const randomReaction = reaction.reactions[randomIntFromInterval(0, reaction.reactions.length - 1)];
-                            return await msg.react(randomReaction);
+                for (const word of textMessage.split(" ")) {
+                    if (word.toLowerCase() === keyworkd.toLowerCase()) {
+                        for (const allowedGroup of reaction.allowedGroups) {
+                            let shouldReact = false;
+                            if (isId(allowedGroup)) {
+                                shouldReact = chat.id._serialized === allowedGroup;
+                            } else {
+                                const chatList = CHATGROUPS.find(chatGroup => chatGroup.name === allowedGroup)
+                                shouldReact = !!chatList && chatList.ids.includes(chat.id._serialized);
+                            }
+                            if (shouldReact) {
+                                const randomReaction = reaction.reactions[randomIntFromInterval(0, reaction.reactions.length - 1)];
+                                return await msg.react(randomReaction);
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
 }
 
