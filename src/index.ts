@@ -13,7 +13,7 @@ interface MessageReaction {
     allowedGroups: string[];
 }
 
-interface ChatGroups { 
+interface ChatGroups {
     name: string;
     ids: string[];
 }
@@ -54,7 +54,7 @@ import { randomIntFromInterval } from './utils/util';
 import { isId } from './utils/whatsapp.util';
 
 const client = new Client({
-    authStrategy: new LocalAuth({ clientId: IS_PRODUCTION? WCLIENT_ID: undefined, dataPath: IS_PRODUCTION? "/app/auth_data": undefined }),
+    authStrategy: new LocalAuth({ clientId: IS_PRODUCTION ? WCLIENT_ID : undefined, dataPath: IS_PRODUCTION ? "/app/auth_data" : undefined }),
     puppeteer: {
         args: ['--no-sandbox'],
     }
@@ -207,6 +207,7 @@ const handleMessage = async (msg: Message) => {
             }
         }
 
+    }
 }
 
 client.on('message_create', handleMessage);
