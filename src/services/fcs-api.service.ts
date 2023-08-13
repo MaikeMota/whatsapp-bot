@@ -96,7 +96,7 @@ export async function getCriptoInfo(ticker: string) {
             tickInfo = (await retrieveData<CriptoInfo>(DataTypeEnum.CRYPTO, ticker))[0]
         }
     } else {
-        tickInfo = (await retrieveData<CriptoInfo>(DataTypeEnum.CRYPTO, ticker))[0]
+        tickInfo = (await retrieveData<CriptoInfo>(DataTypeEnum.CRYPTO, ticker)).success[0]
     }
     criptoCache.set(ticker, tickInfo);
     return tickInfo
