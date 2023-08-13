@@ -25,14 +25,14 @@ export class CriptoCommand extends Command {
         }
 
         const ticker = `${pair1}/${pair2}`;
-        const [tickInfo] = await getCriptoInfo(ticker)
+        const tickInfo = await getCriptoInfo(ticker)
 
         if (!tickInfo) {
             msg.reply(`Não consegui encontrar informações sobre o preço de ${ticker}`);
             return
         }
 
-        const lastUpdateDate = new Date(tickInfo.t * 1000)
+        const lastUpdateDate = new Date(tickInfo.lastUpdate * 1000)
         const horaAtualizacao = lastUpdateDate.toLocaleTimeString()
         const symbol = getSymbolFor(pair2)
         msg.reply(this.getMessageForUser(ticker, symbol, tickInfo, horaAtualizacao))
