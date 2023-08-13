@@ -1,12 +1,13 @@
+import { FinancialAPIRequestResult } from "./financial-api-request-result.interface";
 import { StockInfo } from "./stock-info.interface";
 
 
 
-export async function getStockInfo(tickers: string[]): Promise<TickerRequestResult> {
+export async function getStockInfo(tickers: string[]): Promise<FinancialAPIRequestResult<StockInfo>> {
 
     const apiResult = await fetch(`https://brapi.dev/api/quote/${tickers.join(',')}?interval=1d`).then(r => r.json() as Promise<BRAPIResponse>);
 
-    const results: TickerRequestResult = {
+    const results: FinancialAPIRequestResult<StockInfo> = {
         success: [],
         failed: []
     }
@@ -43,12 +44,6 @@ interface BRAPITickerAvailablesResponse {
     indexes: string[];
     stocks: string[];
 }
-
-interface TickerRequestResult {
-    success: StockInfo[];
-    failed: string[];
-}
-
 
 interface BRAPIResponse {
     results: BRAPITickerInfoResult[];
