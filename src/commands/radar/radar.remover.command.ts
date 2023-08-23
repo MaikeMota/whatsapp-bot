@@ -17,7 +17,7 @@ export class RadarRemoverCommand extends Command {
 
     protected async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
         const [ticker] = argsArray;
-        return !!ticker && hasCategorySuffix(ticker);
+        return !!ticker;
     }
 
     async handle(client: Client, chat: Chat, msg: Message, ...tickers: string[]): Promise<void> {

@@ -17,7 +17,7 @@ export class RadarAdicionarCommand extends Command {
 
     protected async isValid(chat: Chat, msg: Message, ...argsArray: string[]): Promise<boolean> {
         const [ticker] = argsArray.filter(t => !!t);
-        return !!ticker && hasCategorySuffix(ticker.trim());
+        return !!ticker;
     }
 
     async handle(client: Client, chat: Chat, msg: Message, ...tickers: string[]): Promise<void> {
