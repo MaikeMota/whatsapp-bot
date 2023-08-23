@@ -3,6 +3,7 @@ import { resolve } from "path";
 import { Chat, Client, Message } from "whatsapp-web.js";
 import { StateSaver } from "../../utils/interfaces/state-save.interface";
 import { JSONStateSaver } from "../../utils/json-state-saver";
+import { removeCategorySuffix } from "../../utils/ticker.util";
 import { Command } from "../command";
 import { RadarSaveState } from "./radar.savestate";
 import { RADAR_PATH } from "./radar.util";
@@ -17,7 +18,8 @@ const updateIntervalInHours = 1000 * 60 * 60 * parseInt(RADAR_PREFERIDAS_UPDATE_
 let lastUpdatedtime = new Date().getTime()
 
 let cachedTotalUsers: number;
-let cachedResult: Map<string, number>;
+let cachedByTicker: Map<string, number>;
+let cachedByCompany: Map<string, number>;
 
 
 export class RadarPreferidasCommand extends Command {
@@ -36,11 +38,12 @@ export class RadarPreferidasCommand extends Command {
             showAll = true;
         }
         const topNToDisplay = parseInt(argsArray[0] || "10");
-        const mostWanted = new Map<string, number>();
+        const mostWantedByTicker = new Map<string, number>();
+        const mostWantedByCompany = new Map<string, number>();
         let totalUsers = 0;
 
         const ttlExpired = lastUpdatedtime + updateIntervalInHours < new Date().getTime();
-        const shouldUpdateResults = !cachedResult || ttlExpired
+        const shouldUpdateResults = !cachedByTicker || ttlExpired
 
         if (shouldUpdateResults) {
             console.log(`[RadarPreferidasCommand] Updating Cached results...`)
@@ -50,24 +53,36 @@ export class RadarPreferidasCommand extends Command {
                 }
                 const radarSaveState = await this.stateSaver.load(resolve(BASE_PATH, file).replace(".json", ""));
                 for (const ticker of radarSaveState.tickers) {
-                    const total = mostWanted.get(ticker);
-                    if (total) {
-                        mostWanted.set(ticker, total + 1)
-                    } else {
-                        mostWanted.set(ticker, 1);
-                    }
+                    const totalByTicker = mostWantedByTicker.get(ticker);
+                    mostWantedByTicker.set(ticker, (totalByTicker || 0) + 1)
+                    
+                    const tickerWithoutSuffix = removeCategorySuffix(ticker);
+                    const totalByCompany = mostWantedByCompany.get(tickerWithoutSuffix)
+                    mostWantedByCompany.set(tickerWithoutSuffix, (totalByCompany || 0) + 1)
                 }
                 totalUsers++
             }
             cachedTotalUsers = totalUsers;
-            cachedResult = new Map([...mostWanted.entries()].sort((a, b) => b[1] - a[1]));
+            cachedByTicker = new Map([...mostWantedByTicker.entries()].sort((a, b) => b[1] - a[1]));
+            cachedByCompany = new Map([...mostWantedByCompany.entries()].sort((a, b) => b[1] - a[1]));
+
         }
         const message = [`Entre os ${cachedTotalUsers} usuários registrados no *Radar*,
  as ${!showAll ? `*Top ${topNToDisplay}*` : ""} empresas preferidas são:\n`]
 
 
         let counter = 1;
-        for (const [key, count] of cachedResult.entries()) {
+        message.push(`*Por empresa:*`)
+        for (const [key, count] of cachedByCompany.entries()) {
+            message.push(`${key}\t- ${count.toString().padStart(4, " ")}x`)
+            if (!showAll && counter++ >= topNToDisplay) {
+                break;
+            }
+        }
+        counter = 1;
+        message.push(`\n`)
+        message.push(`*Por Ticker:*`)
+        for (const [key, count] of cachedByTicker.entries()) {
             message.push(`${key}\t- ${count.toString().padStart(4, " ")}x`)
             if (!showAll && counter++ >= topNToDisplay) {
                 break;

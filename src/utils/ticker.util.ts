@@ -4,6 +4,11 @@ export function hasCategorySuffix(ticker: string): boolean {
     return ticker.match(/[0-9]{1,2}$/)?.length > 0
 }
 
+export function removeCategorySuffix(ticker: string): string {
+    if (!ticker) return "";
+    return ticker.replace(/[0-9]{1,2}/, "")
+}
+
 export function tickerInfoToOneLineString(tickerInfo: StockInfo) {
     return `${tickerInfo.ticker.toUpperCase()}:\t*R$ ${tickerInfo.price.toString().replace('.', ',')}* (${tickerInfo.dailyChangeInPercent > 0 ? '+' : ''}${tickerInfo.dailyChangeInPercent.toPrecision(2).replace('.', ',')}%)`
 }
