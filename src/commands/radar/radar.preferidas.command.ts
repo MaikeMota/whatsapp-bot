@@ -3,6 +3,7 @@ import { resolve } from "path";
 import { Chat, Client, Message } from "whatsapp-web.js";
 import { StateSaver } from "../../utils/interfaces/state-save.interface";
 import { JSONStateSaver } from "../../utils/json-state-saver";
+import { asPercentageString } from "../../utils/string.utils";
 import { removeCategorySuffix } from "../../utils/ticker.util";
 import { Command } from "../command";
 import { RadarSaveState } from "./radar.savestate";
@@ -52,11 +53,16 @@ export class RadarPreferidasCommand extends Command {
                     continue;
                 }
                 const radarSaveState = await this.stateSaver.load(resolve(BASE_PATH, file).replace(".json", ""));
+                const companyByUser = new Map<string, boolean>()
                 for (const ticker of radarSaveState.tickers) {
                     const totalByTicker = mostWantedByTicker.get(ticker);
                     mostWantedByTicker.set(ticker, (totalByTicker || 0) + 1)
-                    
+
                     const tickerWithoutSuffix = removeCategorySuffix(ticker);
+                    if (companyByUser.get(tickerWithoutSuffix)) {
+                        continue;
+                    }
+                    companyByUser.set(tickerWithoutSuffix, true);
                     const totalByCompany = mostWantedByCompany.get(tickerWithoutSuffix)
                     mostWantedByCompany.set(tickerWithoutSuffix, (totalByCompany || 0) + 1)
                 }
@@ -74,7 +80,7 @@ export class RadarPreferidasCommand extends Command {
         let counter = 1;
         message.push(`*Por empresa:*`)
         for (const [key, count] of cachedByCompany.entries()) {
-            message.push(`${key}\t- ${count.toString().padStart(4, " ")}x`)
+            message.push(`${key}\t-${count.toString().padStart(4, " ")}x\t(${asPercentageString((count / cachedTotalUsers) * 100)})`)
             if (!showAll && counter++ >= topNToDisplay) {
                 break;
             }
@@ -83,7 +89,7 @@ export class RadarPreferidasCommand extends Command {
         message.push(`\n`)
         message.push(`*Por Ticker:*`)
         for (const [key, count] of cachedByTicker.entries()) {
-            message.push(`${key}\t- ${count.toString().padStart(4, " ")}x`)
+            message.push(`${key}\t-${count.toString().padStart(4, " ")}x`)
             if (!showAll && counter++ >= topNToDisplay) {
                 break;
             }
