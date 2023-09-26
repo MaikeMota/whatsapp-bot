@@ -19,7 +19,7 @@
 import { Chat, Client, Message } from "whatsapp-web.js";
 import { Command } from "./command";
 
-import { getStockInfo } from "../services/brapi.service";
+import { getStockInfo } from "../services/fcs-api.service";
 
 import unitsInfo from '../data/units-b3.json';
 

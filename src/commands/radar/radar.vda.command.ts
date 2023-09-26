@@ -1,9 +1,6 @@
 import { Chat, Client, Message } from "whatsapp-web.js";
-import { getStockInfo } from "../../services/brapi.service";
-import { StockInfo } from "../../services/stock-info.interface";
 import { StateSaver } from "../../utils/interfaces/state-save.interface";
 import { JSONStateSaver } from "../../utils/json-state-saver";
-import { sortByMostNegativeDailyChange, tickerInfoToOneLineString } from "../../utils/ticker.util";
 import { Command } from "../command";
 
 
@@ -22,34 +19,7 @@ export class RadarVDACommand extends Command {
 
 
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
-        if (!["554399631160-1592936664@g.us", "120363159731656783@g.us"].includes(chat.id._serialized)) {
-            msg.reply(`Este comando está disponível apenas para o grupo BOT VDA.
-    *Acesse o link abaixo para entrar no grupo:*
-        https://chat.whatsapp.com/FmBQj0c6hrt8Ko8JdN24PL`)
-            return;
-        }
-        const currState = await this.getState();
-
-        const tickers = currState.flat();
-
-        const tickersInfo = await getStockInfo(tickers);
-        const message = []
-        const stockInfos: StockInfo[] = []
-        for (const ticker of tickers) {
-            const info = tickersInfo.success.find(ti => ti.ticker === ticker);
-            if (!info) {
-                console.log(`[RadarVDACommand] Could not find info for ticker ${ticker}`)
-                continue
-            }
-            stockInfos.push(info)
-        }
-        
-        stockInfos
-            .sort(sortByMostNegativeDailyChange)
-            .forEach(info => message.push("\t" + tickerInfoToOneLineString(info)));
-
-        message.push("\n** As cotações demonstradas possuem até 1 hora de atraso.")
-        await msg.reply(message.join("\n"));
+        msg.reply("Comando desabilitado.")
     }
 
     private async getState(): Promise<Array<string>> {

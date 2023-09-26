@@ -10,6 +10,7 @@ import { TrackerCommandStop } from "./trackerCommandStop";
 export const stateSaver: StateSaver<TrackerCommandSaveState> = new JSONStateSaver<TrackerCommandSaveState>();
 
 export function resolveKey(id: string, key: string) {
+    // enhance: allow use same key across different groups
     return `tracking-${id}-${key}`;
 }
 

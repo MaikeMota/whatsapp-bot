@@ -2,6 +2,7 @@ import { FinancialAPIRequestResult } from "./financial-api-request-result.interf
 import { CriptoInfo, StockInfo } from "./stock-info.interface";
 
 const FCS_API_KEY = process.env.FCS_API_KEY;
+const FCS_API_KEY_2 = process.env.FCS_API_KEY_2;
 
 const DataTypeEnum = {
     STOCK: 'stock',

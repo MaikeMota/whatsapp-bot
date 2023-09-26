@@ -1,5 +1,5 @@
 import { Chat, Client, Message } from "whatsapp-web.js";
-import { getStockInfo } from "../../services/brapi.service";
+import { getStockInfo } from "../../services/fcs-api.service";
 import { StockInfo } from "../../services/stock-info.interface";
 import { StateSaver } from "../../utils/interfaces/state-save.interface";
 import { JSONStateSaver } from "../../utils/json-state-saver";

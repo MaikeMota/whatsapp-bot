@@ -4,7 +4,7 @@ import { JSONStateSaver } from "../utils/json-state-saver";
 import { Command } from "./command";
 
 import { formatToBRL, formatToNumber, parseToNumber } from "brazilian-values";
-import { getStockInfo } from "../services/brapi.service";
+import { getStockInfo } from "../services/fcs-api.service";
 import { calcularNovaPosicao, getPercentualDiff } from "../utils/math.utils";
 import { asPercentageString } from "../utils/string.utils";
 import { hasCategorySuffix } from "../utils/ticker.util";

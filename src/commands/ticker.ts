@@ -1,7 +1,8 @@
 import { Chat, Client, Message } from "whatsapp-web.js";
 import { Command } from "./command";
 
-import { getAvailableTickersFor, getStockInfo } from "../services/brapi.service";
+import { getAvailableTickersFor } from "../services/brapi.service";
+import { getStockInfo } from "../services/fcs-api.service";
 import { StockInfo } from "../services/stock-info.interface";
 import { hasCategorySuffix, sortByMostNegativeDailyChange, tickerInfoToOneLineString } from "../utils/ticker.util";
 
@@ -22,7 +23,7 @@ export class TickerCommand extends Command {
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
 
         const ticker = argsArray[0];
-        
+
         if (!hasCategorySuffix(ticker)) {
             let tickersToAdd = availableTickerFor.get(ticker)
             if (!tickersToAdd || tickersToAdd.length === 0) {
@@ -32,7 +33,7 @@ export class TickerCommand extends Command {
             argsArray = [...argsArray.filter(a => a !== ticker), ...tickersToAdd]
         }
 
-        if(!argsArray.length) {
+        if (!argsArray.length) {
             msg.reply(`Não consegui nenhum ticker com o prefixo *${ticker}*`);
             return;
         }
@@ -68,7 +69,7 @@ export class TickerCommand extends Command {
                     availableTickerFor.set(ticker, tickersToAdd);
                 }
                 tickersToRequest = [...tickersToRequest.filter(a => a !== ticker), ...tickersToAdd]
-            }else { 
+            } else {
                 tickersToRequest.push(ticker);
             }
         }
