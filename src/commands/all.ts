@@ -1,4 +1,5 @@
 import { Client, GroupChat, Message } from "whatsapp-web.js";
+import { userIsGroupAdmin } from "../utils/whatsapp.util";
 import { Command } from "./command";
 
 const ALL_COMMAND_INTERVAL_IN_MINUTES = parseInt((process.env.ALL_COMMAND_INTERVAL_IN_MINUTES || `5`))
@@ -19,6 +20,10 @@ export class MentionAllCommand extends Command {
         const contact = await msg.getContact();
         if (!chat.isGroup || BANNED_USERS.includes(contact.number)) {
             return;
+        }
+        const isUserAdmin = await userIsGroupAdmin(msg, chat)
+        if (!isUserAdmin) {
+            return
         }
 
         const key = `${chat.id}-${msg.author}`
