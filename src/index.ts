@@ -114,7 +114,7 @@ const handlers: Constructor<Command>[] = [
     TickerCommand,
     CriptoCommand,
     SairCommand,
-    VDACommand,
+    //VDACommand,
     TempoCommand,
     GetIdCommand,
     MentionAllCommand,
