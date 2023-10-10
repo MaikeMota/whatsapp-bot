@@ -87,14 +87,25 @@ export class TickerCommand extends Command {
     }
 
     private getTickerMessage(stockInfo: StockInfo) {
-        return `*${stockInfo.businessName}*
-${stockInfo.ticker.toUpperCase()}: *R$ ${stockInfo.price.toFixed(2).replace('.', ',')}* (${stockInfo.dailyChangeInPercent > 0 ? '+' : ''}${stockInfo.dailyChangeInPercent.toFixed(2).replace('.', ',')}%)
-    
-    Mínima: R$ ${stockInfo.lowPrice.toFixed(2).replace('.', ',')}
-    Máxima: R$ ${stockInfo.highPrice.toFixed(2).replace('.', ',')}
-    Mínima 52 semanas: R$ ${stockInfo.low52WeekPrice.toFixed(2).replace('.', ',')}
-    Maxima 52 semanas: R$ ${stockInfo.high52WeekPrice.toFixed(2).replace('.', ',')}
-    
-    *Última atualização às ${new Date(stockInfo.lastUpdate).toLocaleTimeString()}...* `;
+
+        const messages = [];
+
+        if(stockInfo.businessName) { 
+            messages.push(`*${stockInfo.businessName}*`);
+        }
+        messages.push(`${stockInfo.ticker.toUpperCase()}: *R$ ${stockInfo.price.toFixed(2).replace('.', ',')}* (${stockInfo.dailyChangeInPercent > 0 ? '+' : ''}${stockInfo.dailyChangeInPercent.toFixed(2).replace('.', ',')}%)`);
+        messages.push("");
+        messages.push(`Mínima: R$ ${stockInfo.lowPrice.toFixed(2).replace('.', ',')}`);
+        messages.push(`Máxima: R$ ${stockInfo.highPrice.toFixed(2).replace('.', ',')}`);
+        if(stockInfo.low52WeekPrice) { 
+            messages.push(`Mínima 52 semanas: R$ ${stockInfo.low52WeekPrice.toFixed(2).replace('.', ',')}`);
+        }
+        if(stockInfo.high52WeekPrice){ 
+            messages.push(`Maxima 52 semanas: R$ ${stockInfo.high52WeekPrice.toFixed(2).replace('.', ',')}`);
+        }
+        messages.push("");
+        messages.push(`*Última atualização às ${new Date(stockInfo.lastUpdate).toLocaleTimeString()}...*`);
+
+        return messages.join("\n");
     }
 }
