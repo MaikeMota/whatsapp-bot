@@ -18,7 +18,7 @@ export class MentionAllCommand extends Command {
     async handle(client: Client, chat: GroupChat, msg: Message, ...argsArray: string[]): Promise<void> {
 
         const contact = await msg.getContact();
-        if (!chat.isGroup || BANNED_USERS.includes(contact.number)) {
+        if (!msg.fromMe && (!chat.isGroup || BANNED_USERS.includes(contact.number))) {
             return;
         }
         const isUserAdmin = await userIsGroupAdmin(msg, chat)
