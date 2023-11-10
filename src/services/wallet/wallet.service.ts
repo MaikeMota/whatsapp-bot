@@ -39,12 +39,12 @@ export class WalletService {
     }
 
     async updatePosition(key: string, ticker: string, updatedPosition: WalletPosition) {
-        
-        let actualPosition = await this.getPosition(key, ticker);
+
+        let actualPosition = await this.getPosition(key, ticker).catch(e => undefined);
         const alreadyExists = !!actualPosition;
 
         this.cachedWallet[ticker] = updatedPosition;
-        await this.stateSaver.save(key, this.cachedWallet);
+        await this.stateSaver.save(this.resolveKey(key), this.cachedWallet);
 
         return alreadyExists;
     }

@@ -32,7 +32,7 @@ export class WalletAddCommand extends Command {
                 proventosRecebidos: parseToNumber(proventosRecebidos || `0`)
             }
             
-            const alreadyExists = this.walletService.updatePosition(contactId, ticker, newPosition);
+            const alreadyExists = await this.walletService.updatePosition(contactId, ticker, newPosition);
 
             await msg.reply(`${ticker.toUpperCase()} ${alreadyExists ? 'adicionado' : 'Atualizado'} com sucesso!`)
         } catch (error) {
