@@ -38,15 +38,31 @@ export class WalletService {
         return this.cachedWallet;
     }
 
-    async updatePosition(key: string, ticker: string, updatedPosition: WalletPosition) {
+    async updatePosition(key: string, updatedPosition: WalletPosition) {
 
+        let actualPosition = await this.getPosition(key, updatedPosition.ticker).catch(e => undefined);
+        const alreadyExists = !!actualPosition;
+
+        this.cachedWallet[updatedPosition.ticker] = updatedPosition;
+        await this.saveState(key)
+        return alreadyExists;
+    }
+
+    async removePosition(key: string, ticker: string) {
         let actualPosition = await this.getPosition(key, ticker).catch(e => undefined);
         const alreadyExists = !!actualPosition;
 
-        this.cachedWallet[ticker] = updatedPosition;
-        await this.stateSaver.save(this.resolveKey(key), this.cachedWallet);
+        if(!alreadyExists) {
+            return Promise.reject(WalletService.TICKER_NOT_REGISTERED_YET.replace(WalletService.TICKER_PLACEHOLDER, ticker));
+        }
 
-        return alreadyExists;
+        this.cachedWallet[ticker] = undefined;
+
+        await this.saveState(key);
+    }
+
+    private async saveState(key: string) {
+        await this.stateSaver.save(this.resolveKey(key), this.cachedWallet);
     }
 
     private resolveKey(key: string) {

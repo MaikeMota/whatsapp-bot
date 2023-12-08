@@ -1,7 +1,8 @@
 export interface WalletPosition {
-    precoMedio: number;
-    quantidade: number;
-    dpaProjetivo: number;
-    dpaPago: number;
-    proventosRecebidos: number;
+    ticker: string;
+    averagePrice: number;
+    quantity: number;
+    dpsProjective: number;
+    dpsPaid: number;
+    dividendsEarned: number;
 }
