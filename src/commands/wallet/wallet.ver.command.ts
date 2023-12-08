@@ -7,7 +7,7 @@ import { WalletPosition } from "../../services/wallet/wallet.position.interface"
 import { WalletService } from "../../services/wallet/wallet.service";
 import { getPercentualDiff } from "../../utils/math.utils";
 import { asPercentageString } from "../../utils/string.utils";
-import { hasCategorySuffix } from "../../utils/ticker.util";
+import { hasCategorySuffix, resolveTicker } from "../../utils/ticker.util";
 import { extractContactId } from "../../utils/whatsapp.util";
 import { Command } from "../command";
 
@@ -23,7 +23,7 @@ export class WalletVerCommand extends Command {
         const contactId = await extractContactId(msg);
         try {
 
-            const ticker = await this.resolveTicker(...argsArray)
+            const ticker = resolveTicker(...argsArray)
 
             const wallet = await this.walletService.getWallet(contactId);
             const msgs = [];
@@ -70,14 +70,14 @@ export class WalletVerCommand extends Command {
     }
 
     private formatMessage(tickerInfo: StockInfo, position: WalletPosition): any {
-        const percentDiff = getPercentualDiff(position.precoMedio, tickerInfo.price);
-        return `*[${tickerInfo.ticker}] ${formatToBRL(position.precoMedio)}*
-    _Quantidade_:            ${formatToNumber(position.quantidade)}
-    _Preço Médio_:          *${formatToBRL(position.precoMedio)} *(${asPercentageString(percentDiff)})*
-    _DPA Proj_.:            *${formatToBRL(position.dpaProjetivo)}*
-    _DPA Proj_. Pago:       *${formatToBRL(position.dpaPago)}*
-    _DPA Proj Restante_.:   *${formatToBRL(position.dpaProjetivo - position.dpaPago)}*
-    _Proventos Recebidos_:  *${formatToBRL(position.proventosRecebidos)}*`;
+        const percentDiff = getPercentualDiff(position.averagePrice, tickerInfo.price);
+        return `*[${tickerInfo.ticker}] ${formatToBRL(position.averagePrice)}*
+    _Quantidade_:            ${formatToNumber(position.quantity)}
+    _Preço Médio_:          *${formatToBRL(position.averagePrice)} *(${asPercentageString(percentDiff)})*
+    _DPA Proj_.:            *${formatToBRL(position.dpsProjective)}*
+    _DPA Proj_. Pago:       *${formatToBRL(position.dpsPaid)}*
+    _DPA Proj Restante_.:   *${formatToBRL(position.dpsProjective - position.dpsPaid)}*
+    _Proventos Recebidos_:  *${formatToBRL(position.dividendsEarned)}*`;
     }
 
     private async viewAllWallet(wallet: Wallet): Promise<string[]> {
@@ -93,29 +93,17 @@ export class WalletVerCommand extends Command {
 
             const { price } = cotacoesMap.get(ticker);
 
-            const percentDiff = getPercentualDiff(position.precoMedio, price);
+            const percentDiff = getPercentualDiff(position.averagePrice, price);
 
             msgs.push(`*[${ticker}] ${formatToBRL(price)}*
-    _Quantidade_:      ${formatToNumber(position.quantidade)}
-    _Preço Médio_:     ${formatToBRL(position.precoMedio)} *(${asPercentageString(percentDiff)})*
-    _DPA Proj_.:       ${formatToBRL(position.dpaProjetivo)}
-    _DPA Proj_. Pago:       ${formatToBRL(position.dpaPago)}
-    _DPA Proj Restante_.: *${formatToBRL(position.dpaProjetivo - position.dpaPago)}*
-    _Proventos Recebidos_: *${formatToBRL(position.proventosRecebidos)}*`);
+    _Quantidade_:      ${formatToNumber(position.quantity)}
+    _Preço Médio_:     ${formatToBRL(position.averagePrice)} *(${asPercentageString(percentDiff)})*
+    _DPA Proj_.:       ${formatToBRL(position.dpsProjective)}
+    _DPA Proj_. Pago:       ${formatToBRL(position.dpsPaid)}
+    _DPA Proj Restante_.: *${formatToBRL(position.dpsProjective - position.dpsPaid)}*
+    _Proventos Recebidos_: *${formatToBRL(position.dividendsEarned)}*`);
         }
 
         return msgs;
-    }
-
-    get isV2(): boolean {
-        return true;
-    }
-
-    private async resolveTicker(...argsArray: string[]) {
-        let [ticker] = argsArray;
-        if (!ticker) {
-            return undefined;
-        }
-        return ticker.toUpperCase();
     }
 }

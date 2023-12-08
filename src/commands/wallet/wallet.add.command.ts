@@ -1,11 +1,10 @@
 import { parseToNumber } from "brazilian-values";
 import { Chat, Client, Message } from "whatsapp-web.js";
+import { WalletPosition } from "../../services/wallet/wallet.position.interface";
 import { WalletService } from "../../services/wallet/wallet.service";
+import { resolveTicker } from "../../utils/ticker.util";
 import { extractContactId } from "../../utils/whatsapp.util";
 import { Command } from "../command";
-
-
-const MISSING_TICKER_PARAM = 'O Ticker é obrigatório';
 
 export class WalletAddCommand extends Command {
 
@@ -20,36 +19,25 @@ export class WalletAddCommand extends Command {
         const contactId = await extractContactId(msg);
 
         try {
-            let ticker = await this.resolveTicker(...argsArray);
+            let ticker = resolveTicker(...argsArray);
 
             const [_, quantidade, precoMedio, dpaProjetivo, dpaPago, proventosRecebidos] = argsArray;
 
-            const newPosition = {
-                quantidade: parseInt(quantidade),
-                precoMedio: parseToNumber(precoMedio),
-                dpaProjetivo: parseToNumber(dpaProjetivo || '0'),
-                dpaPago: parseToNumber(dpaPago || '0'),
-                proventosRecebidos: parseToNumber(proventosRecebidos || `0`)
+            const newPosition: WalletPosition = {
+                ticker,
+                quantity: parseInt(quantidade),
+                averagePrice: parseToNumber(precoMedio),
+                dpsProjective: parseToNumber(dpaProjetivo || '0'),
+                dpsPaid: parseToNumber(dpaPago || '0'),
+                dividendsEarned: parseToNumber(proventosRecebidos || `0`)
             }
-            
-            const alreadyExists = await this.walletService.updatePosition(contactId, ticker, newPosition);
 
-            await msg.reply(`${ticker.toUpperCase()} ${alreadyExists ? 'adicionado' : 'Atualizado'} com sucesso!`)
+            const alreadyExists = await this.walletService.updatePosition(contactId, newPosition);
+
+            await msg.reply(`${ticker.toUpperCase()} ${alreadyExists ? 'Adicionado' : 'Atualizado'} com sucesso!`)
         } catch (error) {
             await msg.reply(error);
             return;
-        }        
-    }
-
-    get isV2(): boolean {
-        return true;
-    }
-
-    private async resolveTicker(...argsArray: string[]) {
-        let [ticker] = argsArray;
-        if (!ticker) {
-            return undefined;
         }
-        return ticker.toUpperCase();
     }
 }
