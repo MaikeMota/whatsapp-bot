@@ -16,3 +16,11 @@ export function tickerInfoToOneLineString(tickerInfo: StockInfo) {
 export function sortByMostNegativeDailyChange(a: StockInfo, b: StockInfo): number {
     return a.dailyChangeInPercent - b.dailyChangeInPercent;
 }
+
+export function resolveTicker(...argsArray: string[]) {
+    let [ticker] = argsArray;
+    if (!ticker) {
+        return undefined;
+    }
+    return ticker.toUpperCase();
+}
