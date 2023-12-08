@@ -1,15 +1,17 @@
-export function calcularNovaPosicao(
-    precoMedioAtual: number,
-    quantidadeAtual: number,
-    valorUnitarioNovaCompra: number,
-    quantidadeNovaCompra: number) {
+import { WalletPosition } from "../services/wallet/wallet.position.interface";
 
-    const novaQuantidade = quantidadeAtual + quantidadeNovaCompra;
-    const novoPrecoMedio = ((precoMedioAtual * quantidadeAtual) + (valorUnitarioNovaCompra * quantidadeNovaCompra)) / (novaQuantidade);
+export function calculateNewPosition(
+    currentAveragePrice: number,
+    currentQuantity: number,
+    unitaryValueFromNewBuy: number,
+    quantityFromNewBuy: number): NewPosition {
+
+    const quantity = currentQuantity + quantityFromNewBuy;
+    const averagePrice = ((currentAveragePrice * currentQuantity) + (unitaryValueFromNewBuy * quantityFromNewBuy)) / (quantity);
 
     return {
-        novaQuantidade,
-        novoPrecoMedio
+        quantity,
+        averagePrice
     }
 }
 
@@ -23,4 +25,4 @@ export function roundNumberTo(number: number, roundAt: number) {
     return roundedViews;
 }
 
-
+type NewPosition = Pick<WalletPosition, 'quantity' | 'averagePrice'> 
