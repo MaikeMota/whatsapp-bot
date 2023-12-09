@@ -25,11 +25,11 @@ export class WalletAddCommand extends Command {
 
             const newPosition: WalletPosition = {
                 ticker,
-                quantity: parseInt(quantidade),
-                averagePrice: parseToNumber(precoMedio),
-                dpsProjective: parseToNumber(dpaProjetivo || '0'),
-                dpsPaid: parseToNumber(dpaPago || '0'),
-                dividendsEarned: parseToNumber(proventosRecebidos || `0`)
+                quantidade: parseInt(quantidade),
+                precoMedio: parseToNumber(precoMedio),
+                dpaProjetivo: parseToNumber(dpaProjetivo || '0'),
+                dpaPago: parseToNumber(dpaPago || '0'),
+                proventosRecebidos: parseToNumber(proventosRecebidos || `0`)
             }
 
             const alreadyExists = await this.walletService.updatePosition(contactId, newPosition);

@@ -10,8 +10,8 @@ export function calculateNewPosition(
     const averagePrice = ((currentAveragePrice * currentQuantity) + (unitaryValueFromNewBuy * quantityFromNewBuy)) / (quantity);
 
     return {
-        quantity,
-        averagePrice
+        quantidade: quantity,
+        precoMedio: averagePrice
     }
 }
 
@@ -25,4 +25,4 @@ export function roundNumberTo(number: number, roundAt: number) {
     return roundedViews;
 }
 
-type NewPosition = Pick<WalletPosition, 'quantity' | 'averagePrice'> 
+type NewPosition = Pick<WalletPosition, 'quantidade' | 'precoMedio'> 

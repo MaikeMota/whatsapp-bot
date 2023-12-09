@@ -20,11 +20,11 @@ export class WalletSetDPSProjectiveCommand extends Command {
             const position = await this.walletService.getPosition(contactId, ticker);
 
             const [_, dpsProjective] = argsArray;
-            position.dpsProjective += parseToNumber(dpsProjective || `0`)
+            position.dpaProjetivo += parseToNumber(dpsProjective || `0`)
 
             await this.walletService.updatePosition(contactId, position)
 
-            await msg.reply(`DPA Projetivo para ${ticker} atualizados com sucesso! Novo DPA: ${formatToBRL(position.dpsProjective)}`)
+            await msg.reply(`DPA Projetivo para ${ticker} atualizados com sucesso! Novo DPA: ${formatToBRL(position.dpaProjetivo)}`)
         } catch (error) {
             await msg.reply(error);
             return;

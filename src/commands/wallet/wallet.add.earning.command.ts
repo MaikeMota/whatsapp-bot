@@ -21,12 +21,12 @@ export class WalletAddEarningCommand extends Command {
 
             const [_, dpaPagoStr] = argsArray;
             const dpsPaid = parseToNumber(dpaPagoStr || `0`)
-            position.dpsPaid += dpsPaid;
-            position.dividendsEarned += dpsPaid * position.quantity
+            position.dpaPago += dpsPaid;
+            position.proventosRecebidos += dpsPaid * position.quantidade
 
             await this.walletService.updatePosition(contactId, position)
 
-            await msg.reply(`Proventos para ${ticker} atualizados com sucesso! Total já pago para o ativo: ${formatToBRL(position.dpsPaid)}`)
+            await msg.reply(`Proventos para ${ticker} atualizados com sucesso! Total já pago para o ativo: ${formatToBRL(position.dpaPago)}`)
         } catch (error) {
             await msg.reply(error);
             return;

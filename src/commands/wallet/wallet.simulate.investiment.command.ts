@@ -47,24 +47,24 @@ export class WalletSimulateInvestimentCommand extends Command {
 
                 const quantidadeParaComprar = Math.floor(valorAporte / currentPrice);
 
-                const proventosPendentes = position.dpsProjective - position.dpsPaid;
+                const proventosPendentes = position.dpaProjetivo - position.dpaPago;
 
                 const proventosEsperadoDesteAporte = (quantidadeParaComprar * proventosPendentes);
 
                 const dyAporte = (proventosPendentes / currentPrice) * 100;
 
-                const proventosEsperadosTotal = (position.quantity * position.dpsProjective) + (quantidadeParaComprar * proventosPendentes);
+                const proventosEsperadosTotal = (position.quantidade * position.dpaProjetivo) + (quantidadeParaComprar * proventosPendentes);
 
-                const patrimonioTotal = position.quantity * position.averagePrice;
+                const patrimonioTotal = position.quantidade * position.precoMedio;
 
                 const totalAportado = quantidadeParaComprar * currentPrice;
 
-                const { quantity: newQuantity, averagePrice: newAveragePrice } = calculateNewPosition(position.averagePrice, position.quantity, currentPrice, quantidadeParaComprar)
+                const { quantidade: newQuantity, precoMedio: newAveragePrice } = calculateNewPosition(position.precoMedio, position.quantidade, currentPrice, quantidadeParaComprar)
                                         //                   (377,71      +    1163,5) / 16029,9
                                         //          (0,1247    * 3029    +  0,0895 * 13000 ) / 16029,9
                                        //    (((4.61 / 36.95) * 3029.9) + ((3.89 / 43.43) * 13000)) / (3029.9 + 13000)
-                const yoc = (position.dpsProjective / position.averagePrice)  * 100;
-                const yocNovo = (position.dpsProjective / newAveragePrice)  * 100;
+                const yoc = (position.dpaProjetivo / position.precoMedio)  * 100;
+                const yocNovo = (position.dpaProjetivo / newAveragePrice)  * 100;
                
 
                 simulacao[ticker] = {
@@ -76,7 +76,7 @@ export class WalletSimulateInvestimentCommand extends Command {
                     proventosEsperadoDesteAporte,
                     dyAporte,
                     posicaoFinal: newQuantity,
-                    precoMedioAntigo: position.averagePrice,
+                    precoMedioAntigo: position.precoMedio,
                     novoPrecoMedio: newAveragePrice,
                     totalAportado
                 }

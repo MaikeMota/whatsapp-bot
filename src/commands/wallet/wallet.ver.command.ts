@@ -8,7 +8,7 @@ import { WalletService } from "../../services/wallet/wallet.service";
 import { getPercentualDiff } from "../../utils/math.utils";
 import { asPercentageString } from "../../utils/string.utils";
 import { hasCategorySuffix, resolveTicker } from "../../utils/ticker.util";
-import { extractContactId } from "../../utils/whatsapp.util";
+import { bold, extractContactId, italic, tabs } from "../../utils/whatsapp.util";
 import { Command } from "../command";
 
 export class WalletVerCommand extends Command {
@@ -70,14 +70,14 @@ export class WalletVerCommand extends Command {
     }
 
     private formatMessage(tickerInfo: StockInfo, position: WalletPosition): any {
-        const percentDiff = getPercentualDiff(position.averagePrice, tickerInfo.price);
-        return `*[${tickerInfo.ticker}] ${formatToBRL(position.averagePrice)}*
-    _Quantidade_:            ${formatToNumber(position.quantity)}
-    _Preço Médio_:          *${formatToBRL(position.averagePrice)} *(${asPercentageString(percentDiff)})*
-    _DPA Proj_.:            *${formatToBRL(position.dpsProjective)}*
-    _DPA Proj_. Pago:       *${formatToBRL(position.dpsPaid)}*
-    _DPA Proj Restante_.:   *${formatToBRL(position.dpsProjective - position.dpsPaid)}*
-    _Proventos Recebidos_:  *${formatToBRL(position.dividendsEarned)}*`;
+        const percentDiff = getPercentualDiff(position.precoMedio, tickerInfo.price);
+        return `${bold(`[${tickerInfo.ticker}]`)} ${formatToBRL(position.precoMedio)}
+    ${italic("Quantidade")}: ${tabs(3)} ${bold(formatToNumber(position.quantidade))}
+    ${italic("Preço Médio")}: ${tabs(3)} ${bold(formatToBRL(position.precoMedio))} (${asPercentageString(percentDiff)})
+    ${italic("DPA Proj")}.: ${tabs(4)} ${bold(formatToBRL(position.dpaProjetivo))}
+    ${italic("DPA Proj. Pago")}: ${tabs(3)} ${bold(formatToBRL(position.dpaPago))}
+    ${italic("DPA Proj Restante")}.: ${tabs(2)} ${bold(formatToBRL(position.dpaProjetivo - position.dpaPago))}
+    ${italic("Proventos Recebidos")}: ${tabs(2)} ${bold(formatToBRL(position.proventosRecebidos))}`;
     }
 
     private async viewAllWallet(wallet: Wallet): Promise<string[]> {
@@ -90,18 +90,9 @@ export class WalletVerCommand extends Command {
         }, new Map<string, StockInfo>());
 
         for (const [ticker, position] of Object.entries(wallet)) {
-
-            const { price } = cotacoesMap.get(ticker);
-
-            const percentDiff = getPercentualDiff(position.averagePrice, price);
-
-            msgs.push(`*[${ticker}] ${formatToBRL(price)}*
-    _Quantidade_:      ${formatToNumber(position.quantity)}
-    _Preço Médio_:     ${formatToBRL(position.averagePrice)} *(${asPercentageString(percentDiff)})*
-    _DPA Proj_.:       ${formatToBRL(position.dpsProjective)}
-    _DPA Proj_. Pago:       ${formatToBRL(position.dpsPaid)}
-    _DPA Proj Restante_.: *${formatToBRL(position.dpsProjective - position.dpsPaid)}*
-    _Proventos Recebidos_: *${formatToBRL(position.dividendsEarned)}*`);
+            msgs.push(
+                this.formatMessage(cotacoesMap.get(ticker), position)
+            );
         }
 
         return msgs;

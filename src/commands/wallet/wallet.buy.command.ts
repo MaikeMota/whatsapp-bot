@@ -29,18 +29,18 @@ export class WalletBuyCommand extends Command {
             if(!previousPosition) { 
                 previousPosition = {
                     ticker,
-                    quantity: 0,
-                    averagePrice: 0,
-                    dpsProjective: 0,
-                    dpsPaid: 0,
-                    dividendsEarned: 0
+                    quantidade: 0,
+                    precoMedio: 0,
+                    dpaProjetivo: 0,
+                    dpaPago: 0,
+                    proventosRecebidos: 0
                 }
             } 
 
-            const { averagePrice, quantity } = calculateNewPosition(previousPosition.averagePrice, previousPosition.quantity, valorUnitarioCompra, quantidade);
+            const { precoMedio, quantidade: newQuantity } = calculateNewPosition(previousPosition.precoMedio, previousPosition.quantidade, valorUnitarioCompra, quantidade);
 
-            previousPosition.quantity = quantity;
-            previousPosition.averagePrice = averagePrice;
+            previousPosition.precoMedio = precoMedio;
+            previousPosition.quantidade = newQuantity;
 
             await this.walletService.updatePosition(contactId, previousPosition);
 
