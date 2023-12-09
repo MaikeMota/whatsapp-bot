@@ -44,7 +44,7 @@ export class WalletBuyCommand extends Command {
 
             await this.walletService.updatePosition(contactId, previousPosition);
 
-            await msg.reply('Compra registrada com sucesso! Veja sua nova posição: ')
+            await msg.reply('Compra registrada com sucesso! Sua nova posição: ')
             return  new WalletVerCommand().handle(client, chat, msg, previousPosition.ticker)
         } catch (error) {
             await msg.reply(error);
