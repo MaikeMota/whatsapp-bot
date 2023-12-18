@@ -39,7 +39,7 @@ export abstract class Command {
     }
 
     get isV2(): boolean {
-        return false
+        return this.hasSubCommands || this.isSubCommand;
     }
 
     get isSubCommand(): boolean {

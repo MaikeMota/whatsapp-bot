@@ -30,7 +30,6 @@ import { Constructor } from './utils/constructor';
 
 import { MentionAllAdminsCommand } from './commands/adminstrative/adms';
 import { MentionAllCommand } from './commands/all';
-import { CarteiraCommand } from './commands/carteira';
 import { CriptoCommand } from './commands/cripto';
 import { DaniBotCommand } from './commands/danibot';
 import { GetIdCommand } from './commands/getId';
@@ -41,15 +40,13 @@ import { TickerCommand } from './commands/ticker';
 import { TrackerCommand } from './commands/tracker/tracker';
 import { TranscreverCommand } from './commands/transcrever';
 import { B3UnitsCommand } from './commands/units';
-import { VDACommand } from './commands/vda';
 
 
 import { GroupAdminCommand } from './commands/adminstrative/group-admin.command';
 import { RadarCommand } from './commands/radar/radar.command';
+import { WalletCommand } from './commands/wallet/wallet.command';
 import { GroupAdminUnlockerRunner } from './runners/group-admin/unlocker.runner';
 import { Runner } from './runners/interfaces/runner.interface';
-import { VDASubscribersNotifyerRunner } from "./runners/vda/VDA-subscribers-notifyer.runner";
-import { VDAViewsNotifyerRunner } from "./runners/vda/VDA-views-notifyer.runner";
 import { randomIntFromInterval } from './utils/util';
 import { isId } from './utils/whatsapp.util';
 
@@ -114,7 +111,6 @@ const handlers: Constructor<Command>[] = [
     TickerCommand,
     CriptoCommand,
     SairCommand,
-    //VDACommand,
     TempoCommand,
     GetIdCommand,
     MentionAllCommand,
@@ -124,14 +120,12 @@ const handlers: Constructor<Command>[] = [
     B3UnitsCommand,
     SelicCommand,
     TrackerCommand,
-    CarteiraCommand,
+    WalletCommand,
     RadarCommand,
     GroupAdminCommand
 ]
 
 const runners: Constructor<Runner>[] = [
-    VDASubscribersNotifyerRunner,
-    VDAViewsNotifyerRunner,
     GroupAdminUnlockerRunner
 ];
 
@@ -150,8 +144,6 @@ type CommandMap = {
 };
 
 const RegisteredHandlers: CommandMap = {}
-
-
 
 const handleMessage = async (msg: Message) => {
 

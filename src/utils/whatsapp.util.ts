@@ -13,3 +13,23 @@ export async function userIsGroupAdmin(originalMessage: Message, chat: GroupChat
     const senderId = await extractContactId(originalMessage);
     return chat.participants.find(p => p.id._serialized === senderId)?.isAdmin;
 }
+
+export function bold(text: string): string {
+    return `*${text}*`;
+}
+
+export function italic(text: string): string {
+    return `_${text}_`;
+}
+
+export function striketrough(text: string): string {
+    return `~${text}~`;
+}
+
+export function monospace(text: string): string {
+    return `\`\`\`${text}\`\`\``;
+}
+
+export function tabs(desiredTabs: number): string {
+    return '\t'.repeat(desiredTabs);
+}

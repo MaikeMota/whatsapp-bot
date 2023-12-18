@@ -8,6 +8,7 @@ import { RadarSaveState } from "./radar.savestate";
 import { RadarUtil } from "./radar.util";
 
 export class RadarAdicionarCommand extends Command {
+    
     command: string = "adicionar";
     alternativeCommands = ["add"];
 
