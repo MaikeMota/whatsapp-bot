@@ -3,15 +3,14 @@ import { Chat, Client, Message } from "whatsapp-web.js";
 import { getStockInfo } from "../../services/fcs-api.service";
 import { WalletService } from "../../services/wallet/wallet.service";
 import { calculateNewPosition } from "../../utils/math.utils";
-import { extractContactId } from "../../utils/whatsapp.util";
+import { bold, extractContactId, italic, tabs } from "../../utils/whatsapp.util";
 import { Command } from "../command";
 import { InvestimentSimulationResult } from "./investiment.simulation.result.interface";
 
 export class WalletSimulateInvestimentCommand extends Command {
 
     command: string = "aportar";
-    alternativeCommands = ['registrar'];
-    usageDescription = " TICKER <Quantidade> <Preço Médio> <DPA Projetivo> <DPA Pago> <Proventos Recebidos> \t-> Adiciona/Atualiza um ativo na sua carteira"
+    usageDescription = " TICKER <Valor Aporte> <Ordenar Por> <TOP N> \t-> Simula um aporte na carteira e indica os ativos mais interessantes para aportar"
 
     private walletService = new WalletService();
 
@@ -89,16 +88,18 @@ export class WalletSimulateInvestimentCommand extends Command {
                 .map(({ cotacao, ativo, totalAportado, posicaoFinal, novoPrecoMedio, precoMedioAntigo, quantidadeParaComprar, proventosEsperadoDesteAporte, dyAporte, proventosEsperadosTotal, yoc, yocNovo }) => {
                     const novoPmPercent = ((novoPrecoMedio - precoMedioAntigo) / precoMedioAntigo) * 100;
                     const yocNovoPercent = ((yocNovo - yoc  ) / yoc) * 100;
-                    return `[${ativo} - ${formatToBRL(cotacao)}] 
-    Capacidade Compra > ${quantidadeParaComprar.toString().padStart(4, ' ')}
-    Total Aportado    > ${formatToBRL(totalAportado)} (${((totalAportado / valorAporte) * 100).toLocaleString('pt-BR')}%)
-    Posição final     > ${posicaoFinal.toString().padStart(4, ' ')}
-    PM Atual          > ${formatToBRL(precoMedioAntigo)}
-    Novo PM           > ${formatToBRL(novoPrecoMedio)} (${novoPmPercent > 0 ? '+' : ''}${novoPmPercent.toFixed(2)}%)
-    Proventos Aporte  > ${formatToBRL(proventosEsperadoDesteAporte)}
-    DY Aporte         > ${dyAporte.toLocaleString('pt-BR').padStart(5, ' ')}%
-    Proventos Totais  > ${formatToBRL(proventosEsperadosTotal)}
-    DY final          > ${yoc.toLocaleString('pt-BR').padStart(5, ' ')}% -> ${yocNovo.toLocaleString('pt-BR').padStart(5, ' ')}% (${yocNovoPercent > 0 ? '+' : ''}${yocNovoPercent.toFixed(2)}%)`
+
+                    return `${bold(`[${ativo}]`)}
+    ${italic("Cotação")} ${tabs(3)} > ${formatToBRL(cotacao)} 
+    ${italic("Capacidade Compra")} ${tabs(1)} > ${quantidadeParaComprar.toString().padStart(4, ' ')}
+    ${italic("Total Aportado")} ${tabs(2)} > ${formatToBRL(totalAportado)} (${((totalAportado / valorAporte) * 100).toLocaleString('pt-BR')}%)
+    ${italic("Posição final")} ${tabs(2)} > ${posicaoFinal.toString().padStart(4, ' ')}
+    ${italic("PM Atual")} ${tabs(3)} > ${formatToBRL(precoMedioAntigo)}
+    ${italic("Novo PM")} ${tabs(3)} > ${formatToBRL(novoPrecoMedio)} (${novoPmPercent > 0 ? '+' : ''}${novoPmPercent.toFixed(2)}%)
+    ${italic("Proventos Aporte")} ${tabs(1)} > ${formatToBRL(proventosEsperadoDesteAporte)}
+    ${italic("Potencial DY Aporte")} ${tabs(1)} > ${dyAporte.toLocaleString('pt-BR').padStart(5, ' ')}%
+    ${italic("Proventos Totais")} ${tabs(2)} > ${formatToBRL(proventosEsperadosTotal)}
+    ${italic("DY final")} ${tabs(3)} > ${yoc.toLocaleString('pt-BR').padStart(5, ' ')}% => ${yocNovo.toLocaleString('pt-BR').padStart(5, ' ')}% (${yocNovoPercent > 0 ? '+' : ''}${yocNovoPercent.toFixed(2)}%)`
                 })
             await msg.reply(`= TOP ${topN} para ${campoOrdenacao} =`)
             await chat.sendMessage(msgs.join('\n\n'));

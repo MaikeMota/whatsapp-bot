@@ -3,7 +3,7 @@ import { Chat, Client, Message } from "whatsapp-web.js";
 import { WalletPosition } from "../../services/wallet/wallet.position.interface";
 import { WalletService } from "../../services/wallet/wallet.service";
 import { resolveTicker } from "../../utils/ticker.util";
-import { extractContactId } from "../../utils/whatsapp.util";
+import { bold, extractContactId } from "../../utils/whatsapp.util";
 import { Command } from "../command";
 
 export class WalletAddCommand extends Command {
@@ -34,7 +34,7 @@ export class WalletAddCommand extends Command {
 
             const alreadyExists = await this.walletService.updatePosition(contactId, newPosition);
 
-            await msg.reply(`${ticker.toUpperCase()} ${alreadyExists ? 'Adicionado' : 'Atualizado'} com sucesso!`)
+            await msg.reply(`${ticker.toUpperCase()} ${bold(alreadyExists ? 'Adicionado' : 'Atualizado')} com sucesso!`)
         } catch (error) {
             await msg.reply(error);
             return;
