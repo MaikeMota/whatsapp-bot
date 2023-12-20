@@ -8,15 +8,17 @@ export class ApostaCommand extends Command {
     alternativeCommands = []
 
     async handle(client: Client, chat: GroupChat, msg: Message, ...argsArray: string[]): Promise<void> {
-        const numbers = [];
+        const numbers: number[] = [];
         for (let i = 0; i < 6; i++) {
+
             let number = randomIntFromInterval(1, 60);
             while (numbers.includes(number)) {
                 number = randomIntFromInterval(1, 60);
             }
             numbers.push(number);
         }
-        numbers.sort()
+
+        numbers.sort((a, b) => a - b)
         await msg.reply(bold(numbers.join(", ")));
     }
 
