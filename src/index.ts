@@ -123,7 +123,8 @@ const handlers: Constructor<Command>[] = [
     TrackerCommand,
     WalletCommand,
     RadarCommand,
-    GroupAdminCommand
+    GroupAdminCommand,
+    ApostaCommand
 ]
 
 const runners: Constructor<Runner>[] = [
