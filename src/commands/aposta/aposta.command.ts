@@ -44,7 +44,7 @@ export class ApostaCommand extends Command {
         }
 
         const replyMessages = []
-        for (const g = 0; g < games.length; g++) {
+        for (let g = 0; g < games.length; g++) {
             replyMessages.push(italic(bold(`[Jogo #${g + 1}]`)))
             replyMessages.push(bold(games[g].join(", ")))
             replyMessages.push("")
