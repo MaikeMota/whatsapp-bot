@@ -43,6 +43,7 @@ import { B3UnitsCommand } from './commands/units';
 
 
 import { GroupAdminCommand } from './commands/adminstrative/group-admin.command';
+import { ApostaCommand } from './commands/aposta/aposta.command';
 import { RadarCommand } from './commands/radar/radar.command';
 import { WalletCommand } from './commands/wallet/wallet.command';
 import { GroupAdminUnlockerRunner } from './runners/group-admin/unlocker.runner';
@@ -123,7 +124,8 @@ const handlers: Constructor<Command>[] = [
     TrackerCommand,
     WalletCommand,
     RadarCommand,
-    GroupAdminCommand
+    GroupAdminCommand,
+    ApostaCommand
 ]
 
 const runners: Constructor<Runner>[] = [
