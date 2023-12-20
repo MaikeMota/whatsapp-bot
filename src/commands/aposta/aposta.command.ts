@@ -16,6 +16,7 @@ export class ApostaCommand extends Command {
             }
             numbers.push(number);
         }
+        numbers.sort()
         await msg.reply(bold(numbers.join(", ")));
     }
 
