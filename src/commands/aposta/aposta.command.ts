@@ -1,5 +1,6 @@
 import { Client, GroupChat, Message } from "whatsapp-web.js";
 import { randomIntFromInterval } from "../../utils/util";
+import { bold } from "../../utils/whatsapp.util";
 import { Command } from "../command";
 
 export class ApostaCommand extends Command {
@@ -9,10 +10,13 @@ export class ApostaCommand extends Command {
     async handle(client: Client, chat: GroupChat, msg: Message, ...argsArray: string[]): Promise<void> {
         const numbers = [];
         for (let i = 0; i < 6; i++) {
-            const number = randomIntFromInterval(1, 60);
+            let number = randomIntFromInterval(1, 60);
+            while (numbers.includes(number)) {
+                number = randomIntFromInterval(1, 60);
+            }
             numbers.push(number);
         }
-        await chat.sendMessage(numbers.join(","));
+        await chat.sendMessage(bold(numbers.join(", ")));
     }
 
     get isV2() {
