@@ -29,7 +29,7 @@ export class ApostaCommand extends Command {
             }
         }
 
-        const games: number[][] = [][];
+        const games: number[][] = [];
         for (let i = 0; i < totalGames; i++) {
             const numbers: number[] = [];
             for (let i = 0; i < totalNumbers; i++) {
