@@ -47,6 +47,7 @@ import { RadarCommand } from './commands/radar/radar.command';
 import { WalletCommand } from './commands/wallet/wallet.command';
 import { GroupAdminUnlockerRunner } from './runners/group-admin/unlocker.runner';
 import { Runner } from './runners/interfaces/runner.interface';
+import { RadarAlertsRunner } from './runners/radar/radar.alerts.runner';
 import { randomIntFromInterval } from './utils/util';
 import { isId } from './utils/whatsapp.util';
 
@@ -126,7 +127,8 @@ const handlers: Constructor<Command>[] = [
 ]
 
 const runners: Constructor<Runner>[] = [
-    GroupAdminUnlockerRunner
+    GroupAdminUnlockerRunner,
+    RadarAlertsRunner
 ];
 
 const registerCommand = (command: string, handler: Command, handlers: CommandMap) => {
