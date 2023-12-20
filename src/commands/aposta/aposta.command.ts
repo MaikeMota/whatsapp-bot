@@ -16,7 +16,7 @@ export class ApostaCommand extends Command {
             }
             numbers.push(number);
         }
-        await chat.sendMessage(bold(numbers.join(", ")));
+        await msg.reply(bold(numbers.join(", ")));
     }
 
     get isV2() {
