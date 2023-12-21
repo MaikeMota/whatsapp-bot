@@ -18,14 +18,14 @@ export class ApostaCommand extends Command {
         if (totalNumbersStr) {
             const tn = parseInt(totalNumbersStr)
             if (!isNaN(tn)) {
-                totalNumbers = tn
+                totalNumbers = tn > 60? 60 : tn
             }
         }
 
         if (totalGamesStr) {
             const tg = parseInt(totalGamesStr)
             if (!isNaN(tg)) {
-                totalGames = tg
+                totalGames = tg > 100? 100 : tg
             }
         }
 
