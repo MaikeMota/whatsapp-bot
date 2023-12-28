@@ -28,11 +28,35 @@ interface FCIAPIResponse {
     }[]
 }
 
+let currentKeyIndex = 0;
+let loopCounter = 0;
+
+
+function rotateKey() {
+    currentKeyIndex++;
+    if (currentKeyIndex > 1) {
+        currentKeyIndex = 0;
+    }
+}
+
+function getCurrentKey()  {
+    if (currentKeyIndex === 0) {
+        return FCS_API_KEY;
+    }
+    return FCS_API_KEY_2;
+}
+
 async function retrieveData<T>(dataType: DataType, ...tickers: string[]): Promise<FinancialAPIRequestResult<T>> {
     const searchValue = tickers.join(',')
-    const apiResult = await fetch(`https://fcsapi.com/api-v3/${dataType}/latest?symbol=${searchValue}&exchange=BM%26FBovespa&access_key=${FCS_API_KEY}`).then(async r => (await r.json()) as FCIAPIResponse);
+    const apiResult = await fetch(`https://fcsapi.com/api-v3/${dataType}/latest?symbol=${searchValue}&access_key=${getCurrentKey()}`).then(async r => (await r.json()) as FCIAPIResponse);
 
     if (apiResult.code !== 200) {
+        if (loopCounter < 2 && (apiResult.code === 211 || apiResult.code === 213)) {
+            console.log(`Limite de uso da API ${currentKeyIndex + 1} excedido, rotacionando key.`);
+            rotateKey();
+            loopCounter++
+            return retrieveData(dataType, ...tickers);
+        }
         throw new Error("API Retornou diferente de 200.\n" + apiResult.code + "\n" + apiResult.msg);
     }
     const returnValues: StockInfo[] | CriptoInfo[] = [];
@@ -47,7 +71,7 @@ async function retrieveData<T>(dataType: DataType, ...tickers: string[]): Promis
             dailyChangeInPercent: parseFloat(cp.replace('%', ''))
         })
     }
-
+    loopCounter = 0;
     return {
         success: returnValues as T[],
         failed: []
