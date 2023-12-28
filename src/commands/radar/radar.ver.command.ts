@@ -19,10 +19,7 @@ export class RadarVerCommand extends Command {
 
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
 
-        if (!["554399631160-1592936664@g.us", "120363159731656783@g.us"].includes(chat.id._serialized)) {
-            msg.reply(`Este comando está disponível apenas para o grupo BOT VDA.
-    *Acesse o link abaixo para entrar no grupo:*
-        https://chat.whatsapp.com/FmBQj0c6hrt8Ko8JdN24PL`)
+        if (!["554399631160-1592936664@g.us", "120363159731656783@g.us", "120363192994912111@g.us"].includes(chat.id._serialized)) {
             return;
         }
 
