@@ -18,7 +18,7 @@ export class TempoCommand extends Command {
         const ampersandIndex = cidade.indexOf('&');
         const hasAmpersand = ampersandIndex > -1;
         if (hasAmpersand) {
-            await msg.reply("tô vendo essa zoeira ai!!!!", (await (msg.getChat())).id._serialized);
+            await msg.reply("tô vendo essa zoeira ai!!!!", (await (msg.getContact())).id._serialized);
             cidade = cidade.substring(0, ampersandIndex).trim();
         }
 
