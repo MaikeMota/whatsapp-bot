@@ -1,12 +1,10 @@
 import { Client, GroupChat, Message } from "whatsapp-web.js";
-import { userIsGroupAdmin } from "../utils/whatsapp.util";
+import { extractContactId, userIsGroupAdmin } from "../utils/whatsapp.util";
 import { Command } from "./command";
 
 const ALL_COMMAND_INTERVAL_IN_MINUTES = parseInt((process.env.ALL_COMMAND_INTERVAL_IN_MINUTES || `5`))
 
 const INTERVAL_BETWEEN_USES = ALL_COMMAND_INTERVAL_IN_MINUTES * 60 * 1000
-
-const BANNED_USERS = process.env.ALL_COMMAND_BANNED_USERS.split(',').map(u => u.trim());
 
 const lastUses = {}
 const lastWarnings = {}
@@ -17,11 +15,19 @@ export class MentionAllCommand extends Command {
 
     async handle(client: Client, chat: GroupChat, msg: Message, ...argsArray: string[]): Promise<void> {
 
-        const contact = await msg.getContact();
-        const isUserAdmin = await userIsGroupAdmin(msg, chat)
-        if ((!isUserAdmin && !msg.fromMe) && (!chat.isGroup || BANNED_USERS.includes(contact.number))) {
+        if (!chat.isGroup) {
             return;
         }
+
+        const isFromGroupAdmin = await userIsGroupAdmin(msg, chat)
+
+        if (!msg.fromMe && !isFromGroupAdmin) {
+            const contactId = await extractContactId(msg);
+            msg.reply("Somente administradores podem usar este comando.", contactId);
+            console.log(`Usuário ${contactId} tentou usar o comando @all no grupo ${chat.name} porem não é um administrador.`)
+            return;
+        }
+
         const key = `${chat.id}-${msg.author}`
         const now = Date.now();
 
@@ -43,7 +49,6 @@ export class MentionAllCommand extends Command {
         }
         this.setLastUsage(key, now);
         await chat.sendMessage(text, { mentions });
-
     }
 
     private setLastWarning(key: string, now: number) {
