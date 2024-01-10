@@ -18,14 +18,10 @@ export class MentionAllCommand extends Command {
     async handle(client: Client, chat: GroupChat, msg: Message, ...argsArray: string[]): Promise<void> {
 
         const contact = await msg.getContact();
-        if (!msg.fromMe && (!chat.isGroup || BANNED_USERS.includes(contact.number))) {
+        const isUserAdmin = await userIsGroupAdmin(msg, chat)
+        if ((!isUserAdmin && !msg.fromMe) && (!chat.isGroup || BANNED_USERS.includes(contact.number))) {
             return;
         }
-        const isUserAdmin = await userIsGroupAdmin(msg, chat)
-        if (!isUserAdmin) {
-            return
-        }
-
         const key = `${chat.id}-${msg.author}`
         const now = Date.now();
 
