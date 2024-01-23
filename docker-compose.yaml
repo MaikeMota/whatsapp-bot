@@ -3,8 +3,7 @@ services:
   whatsapp_bot:
     image: ghcr.io/maikemota/whatsapp-bot:latest
     environment:
-      - FCS_API_KEY=${FCS_API_KEY}
-      - FCS_API_KEY_2=${FCS_API_KEY_2}
+      - FCS_API_KEYS=${FCS_API_KEYS}
       - OPEN_WHEATER_KEY=${OPEN_WHEATER_KEY}
       - NODE_ENV=${NODE_ENV}
       - TZ=${TZ}
