@@ -1,9 +1,6 @@
 import { FinancialAPIRequestResult } from "./financial-api-request-result.interface";
 import { CriptoInfo, StockInfo } from "./stock-info.interface";
 
-const FCS_API_KEY = process.env.FCS_API_KEY;
-const FCS_API_KEY_2 = process.env.FCS_API_KEY_2;
-
 const DataTypeEnum = {
     STOCK: 'stock',
     CRYPTO: 'crypto'
@@ -13,6 +10,8 @@ type DataType = (typeof DataTypeEnum)[keyof typeof DataTypeEnum];
 
 const stocksCache = new Map<string, StockInfo>();
 const criptoCache = new Map<string, CriptoInfo>();
+
+
 
 interface FCIAPIResponse {
     code: number,
@@ -28,6 +27,8 @@ interface FCIAPIResponse {
     }[]
 }
 
+
+const KEYS = process.env.FCS_API_KEYS.split(',').map(k => k.trim());
 let currentKeyIndex = 0;
 let loopCounter = 0;
 
@@ -39,26 +40,24 @@ function rotateKey() {
     }
 }
 
-function getCurrentKey()  {
-    if (currentKeyIndex === 0) {
-        return FCS_API_KEY;
-    }
-    return FCS_API_KEY_2;
+function getCurrentKey() {
+    return KEYS[currentKeyIndex];
 }
 
 async function retrieveData<T>(dataType: DataType, ...tickers: string[]): Promise<FinancialAPIRequestResult<T>> {
     const searchValue = tickers.join(',')
     const apiResult = await fetch(`https://fcsapi.com/api-v3/${dataType}/latest?symbol=${searchValue}&access_key=${getCurrentKey()}`).then(async r => (await r.json()) as FCIAPIResponse);
 
+    if ([211, 213].includes(apiResult.code) && loopCounter < KEYS.length) {
+        console.log(`Limite de uso da API ${currentKeyIndex + 1} excedido, rotacionando key.`);
+        rotateKey();
+        loopCounter++
+        return retrieveData(dataType, ...tickers);
+    }
     if (apiResult.code !== 200) {
-        if (loopCounter < 2 && (apiResult.code === 211 || apiResult.code === 213)) {
-            console.log(`Limite de uso da API ${currentKeyIndex + 1} excedido, rotacionando key.`);
-            rotateKey();
-            loopCounter++
-            return retrieveData(dataType, ...tickers);
-        }
         throw new Error("API Retornou diferente de 200.\n" + apiResult.code + "\n" + apiResult.msg);
     }
+
     const returnValues: StockInfo[] | CriptoInfo[] = [];
     for (const result of apiResult.response) {
         const { c, h, l, t, cp, s } = result;
@@ -128,6 +127,11 @@ export async function getCriptoInfo(ticker: string) {
 }
 
 function hasCacheTimeExpired(cachedTime: number) {
+    const nowDate = new Date();
+
+    if (nowDate.getDay() === 0 || nowDate.getDay() === 6) return false;
+    if (nowDate.getHours() < 10 || nowDate.getHours() > 18) return false
+
     return (new Date().getTime() / 1000) > (cachedTime + (60 * 60));
 }
 
