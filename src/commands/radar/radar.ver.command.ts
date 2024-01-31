@@ -4,7 +4,7 @@ import { StockInfo } from "../../services/stock-info.interface";
 import { StateSaver } from "../../utils/interfaces/state-save.interface";
 import { JSONStateSaver } from "../../utils/json-state-saver";
 import { sortByMostNegativeDailyChange, tickerInfoToOneLineString } from "../../utils/ticker.util";
-import { extractContactId } from "../../utils/whatsapp.util";
+import { bold, extractContactId } from "../../utils/whatsapp.util";
 import { Command } from "../command";
 import { RadarSaveState } from "./radar.savestate";
 import { RadarUtil } from "./radar.util";
@@ -18,10 +18,6 @@ export class RadarVerCommand extends Command {
     private stateSaver: StateSaver<RadarSaveState> = new JSONStateSaver<RadarSaveState>();
 
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
-
-        if (!["554399631160-1592936664@g.us", "120363159731656783@g.us", "120363192994912111@g.us"].includes(chat.id._serialized)) {
-            return;
-        }
 
         const contactId = await extractContactId(msg);
         const key = RadarUtil.getStateKey(contactId);
@@ -46,7 +42,7 @@ export class RadarVerCommand extends Command {
             .forEach(info => message.push("\t" + tickerInfoToOneLineString(info)));
 
         if (tickersInfo.failed.length > 0) {
-            message.push("\nNão foi possível recuperar as cotações dos seguintes tickers: " + tickersInfo.failed.join(", "))
+            message.push("\nNão foi possível recuperar as cotações dos seguintes tickers: " + tickersInfo.failed.map(t => bold(t)).join(", "))
         }
 
         message.push("\n** As cotações demonstradas possuem até 1 hora de atraso.")
