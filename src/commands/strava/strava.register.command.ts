@@ -4,12 +4,9 @@ import { StravaService } from "../../services/strava.service";
 import { StateSaver } from "../../utils/interfaces/state-save.interface";
 import { JSONStateSaver } from "../../utils/json-state-saver";
 import { Command } from "../command";
+import { StravaState } from "./strava.state";
 
 const REGEX_PATTERN = /https:\/\/www\.strava\.com\/clubs\/(?<idFromUrl>[0-9]*)|^(?<id>[0-9]*)$/
-
-interface StravaState {
-    [chatId: string]: string
-}
 
 export class StravaRegisterCommand extends Command {
 
