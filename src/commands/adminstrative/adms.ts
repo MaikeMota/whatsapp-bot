@@ -4,7 +4,7 @@ import { Command } from "../command";
 export class MentionAllAdminsCommand extends Command {
     command = '@admin';
     alternativeCommands = ['@admins', '@adms', '@adm']
-    
+
     async handle(client: Client, chat: GroupChat, msg: Message, ...argsArray: string[]): Promise<void> {
 
         let text = "";
@@ -16,7 +16,11 @@ export class MentionAllAdminsCommand extends Command {
                 text += ` @${participant.id.user}`;
             }
         }
-        await chat.sendMessage(text, { mentions });
+
+        text += `
+
+${(await msg.getContact()).pushname} está chamando os administradores do grupo!`
+        await msg.reply(text, chat.id._serialized, { mentions });
     }
 
 }
