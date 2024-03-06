@@ -20,10 +20,9 @@ export class TheOfficeRandomEpCommand extends Command {
 
         const episode = seasonEpisodes[randomIntFromInterval(0, seasonEpisodes.length - 1)];
 
-        const text = `Episódio aleatório de The Office: S${episode.season}E${episode.episode} - ${episode.imdbRating}/10 no IMDB
-    ${bold(episode.title)}
-    ${bold(episode.description)}`;
-        console.log(text)
+        const text = `Episódio aleatório de The Office: ${bold("S" + episode.season + "E" + episode.episode)} - ${bold(episode.imdbRating + "/10")} no IMDB.
+    ${bold("Título:")} ${episode.title}
+    ${bold("Descrição:")} ${episode.description}`;
         await msg.reply(text);
     }
 }

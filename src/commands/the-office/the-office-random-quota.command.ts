@@ -14,7 +14,6 @@ export class TheOfficeRandomQuoteCommand extends Command {
 
     async handle(client: Client, chat: GroupChat, msg: Message, ...argsArray: string[]): Promise<void> {
         const quote = await TheOfficeService.getRandomQuote();
-        console.log(quote)
         await msg.reply(`"${quote.quote}" - ${quote.character}`);
     }
 }
