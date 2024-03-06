@@ -46,6 +46,7 @@ import { GroupAdminCommand } from './commands/adminstrative/group-admin.command'
 import { ApostaCommand } from './commands/aposta/aposta.command';
 import { RadarCommand } from './commands/radar/radar.command';
 import { StravaCommand } from './commands/strava/strava.command';
+import { TheOfficeCommand } from './commands/the-office/the-office.command';
 import { WalletCommand } from './commands/wallet/wallet.command';
 import { GroupAdminUnlockerRunner } from './runners/group-admin/unlocker.runner';
 import { Runner } from './runners/interfaces/runner.interface';
@@ -127,7 +128,8 @@ const handlers: Constructor<Command>[] = [
     RadarCommand,
     GroupAdminCommand,
     ApostaCommand,
-    StravaCommand
+    StravaCommand,
+    TheOfficeCommand
 ]
 
 const runners: Constructor<Runner>[] = [
