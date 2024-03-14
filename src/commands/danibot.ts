@@ -1,4 +1,5 @@
 import { Chat, Client, Message } from "whatsapp-web.js";
+import { quote } from "../utils/whatsapp.util";
 import { Command } from "./command";
 
 const { randomIntFromInterval } = require('../utils/util');
@@ -20,7 +21,7 @@ export class DaniBotCommand extends Command {
         } else {
             message += lerolero()
         }
-        await msg.reply(`[DaniBot] disse: ${message}`)
+        await msg.reply(quote(`[DaniBot] disse: ${message}`))
     }
 }
 
