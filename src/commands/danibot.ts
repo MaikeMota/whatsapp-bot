@@ -21,7 +21,7 @@ export class DaniBotCommand extends Command {
         } else {
             message += lerolero()
         }
-        await msg.reply(quote(`[DaniBot] disse: ${message}`))
+        await msg.reply(quote(message))
     }
 }
 
