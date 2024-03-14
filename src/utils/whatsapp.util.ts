@@ -33,3 +33,15 @@ export function monospace(text: string): string {
 export function tabs(desiredTabs: number): string {
     return '\t'.repeat(desiredTabs);
 }
+
+export function quote(text: string): string {
+    return `> ${text}`;
+}
+
+export function bulletList(text: string[]): string {
+    return text.map(t => `* ${t}`).join("\n");
+}
+
+export function orderedList(text: string[]): string {
+    return text.map((t, i) => `${i + 1}. ${t}`).join("\n");
+}
