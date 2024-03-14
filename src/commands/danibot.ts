@@ -20,14 +20,14 @@ export class DaniBotCommand extends Command {
         } else {
             message += lerolero()
         }
-        await msg.reply(`[DaniBot] disse: ${lerolero()}`)
+        await msg.reply(`[DaniBot] disse: ${message}`)
     }
 }
 
 
 const CLASSICAS_DANI = [
     "Para que a respiração ocorra nos peixes, é necessário que a água entre pela boca e saia pelas brânquias, obedecendo a um fluxo unidirecional. Inicialmente a água entra na cavidade bucal e segue em direção aos filamentos branquiais.",
-    "Eu acho que o boy deveria analisar randomizado as conversas e pegar algumas palavras chaves e trazer informações do Wolfram alpha sobre o assunto",
+    "Eu acho que o bot deveria analisar randomizado as conversas e pegar algumas palavras chaves e trazer informações do Wolfram alpha sobre o assunto",
     "😂😂😂😂",
     "Vou pro bunker",
     "Cof Cof Cof",
