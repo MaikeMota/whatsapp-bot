@@ -44,6 +44,7 @@ import { B3UnitsCommand } from './commands/units';
 
 import { GroupAdminCommand } from './commands/adminstrative/group-admin.command';
 import { ApostaCommand } from './commands/aposta/aposta.command';
+import { PokedexCommand } from './commands/pokedex/pokedex.command';
 import { RadarCommand } from './commands/radar/radar.command';
 import { StravaCommand } from './commands/strava/strava.command';
 import { TheOfficeCommand } from './commands/the-office/the-office.command';
@@ -129,7 +130,8 @@ const handlers: Constructor<Command>[] = [
     GroupAdminCommand,
     ApostaCommand,
     StravaCommand,
-    TheOfficeCommand
+    TheOfficeCommand,
+    PokedexCommand
 ]
 
 const runners: Constructor<Runner>[] = [
