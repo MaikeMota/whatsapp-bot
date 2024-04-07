@@ -50,17 +50,30 @@ import { StravaCommand } from './commands/strava/strava.command';
 import { TheOfficeCommand } from './commands/the-office/the-office.command';
 import { WalletCommand } from './commands/wallet/wallet.command';
 import { GroupAdminUnlockerRunner } from './runners/group-admin/unlocker.runner';
+
 import { Runner } from './runners/interfaces/runner.interface';
-import { RadarAlertsRunner } from './runners/radar/radar.alerts.runner';
 import { randomIntFromInterval } from './utils/util';
 import { isId } from './utils/whatsapp.util';
 
-const client = new Client({
+const USE_WEB_CACHE_VERSION = process.env.USE_WEB_CACHE_VERSION
+
+const config = {
     authStrategy: new LocalAuth({ clientId: IS_PRODUCTION ? WCLIENT_ID : undefined, dataPath: IS_PRODUCTION ? "/app/auth_data" : undefined }),
     puppeteer: {
         args: ['--no-sandbox'],
     }
-});
+}
+
+if (USE_WEB_CACHE_VERSION) {
+    console.log("Using web cache version ", USE_WEB_CACHE_VERSION)
+    config['webVersionCache'] = {
+        type: 'remote',
+        remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/${USE_WEB_CACHE_VERSION}.html`,
+    }
+}
+
+
+const client = new Client(config);
 
 client.on('auth_failure', console.log)
 client.on('loading_screen', console.log)
@@ -136,7 +149,7 @@ const handlers: Constructor<Command>[] = [
 
 const runners: Constructor<Runner>[] = [
     GroupAdminUnlockerRunner,
-    RadarAlertsRunner
+    //RadarAlertsRunner
 ];
 
 const registerCommand = (command: string, handler: Command, handlers: CommandMap) => {
@@ -173,17 +186,21 @@ const handleMessage = async (msg: Message) => {
         const handler = RegisteredHandlers[command]
         if (handler) {
             console.info(`Message contains a registered command ${command}`);
-            if (await handler.isUsageValid(chat, msg, ...argsArray)) {
-                try {
-                    console.info(`Calling handler for ${command}`);
-                    await handler.handle(client, chat, msg, ...argsArray);
-                } catch (e) {
-                    console.error(`Erro ao processar comando ${command}`)
-                    console.error(e);
+            //if (await handler.isUseAllowed(chat.id._serialized, chat.isGroup)) {
+                if (await handler.isUsageValid(chat, msg, ...argsArray)) {
+                    try {
+                        console.info(`Calling handler for ${command}`);
+                        await handler.handle(client, chat, msg, ...argsArray);
+                    } catch (e) {
+                        console.error(`Erro ao processar comando ${command}`)
+                        console.error(e);
+                    }
+                } else {
+                    await msg.reply("Comando Inválido! Modo de uso:\n\n" + handler.usage)
                 }
-            } else {
-                await msg.reply("Comando Inválido! Modo de uso:\n\n" + handler.usage)
-            }
+            // } else {
+
+            // }
         }
 
         const textMessage = msg.body.toLowerCase();
@@ -208,7 +225,6 @@ const handleMessage = async (msg: Message) => {
                 }
             }
         }
-
     }
 }
 
@@ -231,4 +247,3 @@ async function shutdown(event) {
     await Promise.all(shutdownSequences);
     await client.destroy();
 }
-
