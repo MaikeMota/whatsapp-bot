@@ -44,7 +44,7 @@ export class RadarAlertsRunner implements Runner {
                             const contact = await client.getContactById(contactId);
                             await chat.sendMessage(`@${contact.id.user} o preço de ${bold(stockInfo.ticker)} atingiu 
 ${bold(formatToBRL(stockInfo.price))}, está abaixo do seu preço estipulado de ${bold(formatToBRL(alert.price))}!`, {
-    mentions: [contact]
+    mentions: [contact.id._serialized]
 });
                         }
                     }
