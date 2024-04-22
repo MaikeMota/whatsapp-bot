@@ -1,4 +1,4 @@
-version: "3"
+version: "3.2"
 services:
   whatsapp_bot:
     image: ghcr.io/maikemota/whatsapp-bot:latest
