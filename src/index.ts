@@ -33,6 +33,7 @@ import { MentionAllCommand } from './commands/all';
 import { CriptoCommand } from './commands/cripto';
 import { DaniBotCommand } from './commands/danibot';
 import { GetIdCommand } from './commands/getId';
+import { PiadaCommand } from './commands/piada/piada.command';
 import { SairCommand } from './commands/sair';
 import { SelicCommand } from './commands/selic';
 import { TempoCommand } from './commands/tempo';
@@ -144,7 +145,8 @@ const handlers: Constructor<Command>[] = [
     ApostaCommand,
     StravaCommand,
     TheOfficeCommand,
-    PokedexCommand
+    PokedexCommand,
+    PiadaCommand
 ]
 
 const runners: Constructor<Runner>[] = [
