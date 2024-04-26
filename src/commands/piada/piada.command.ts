@@ -18,9 +18,13 @@ export class PiadaCommand extends Command {
     async handle(client: Client, chat: GroupChat, msg: Message, ...argsArray: string[]): Promise<void> {
 
         const piada = getRandomElement(this.piadas);
-        msg.reply(`
-        ${bold(piada.pergunta)}
-        *R:* ${piada.resposta}`
+        msg.reply(`${bold(piada.pergunta)}
+
+${piada.resposta}
+
+${getRandomElement(["😄", "😊", "😃", "😁", "😆", "😀", "🤡", "🤣", "😅", "🙃", "😶‍🌫️", "🐦", "🤪", "😜", "😝", "😛", "😌", "🤓", "🥳","🥸"])}
+`
+
         );
     }
 }
