@@ -3,6 +3,9 @@ import { RandomService } from "../../services/random.service";
 import { bold, italic } from "../../utils/whatsapp.util";
 import { Command } from "../command";
 
+const MAX_GAMES = 100;
+const MAX_NUMBERS = 60;
+
 export class ApostaCommand extends Command {
     command = '/aposta';
     alternativeCommands = []
@@ -20,14 +23,14 @@ export class ApostaCommand extends Command {
         if (totalNumbersStr) {
             const tn = parseInt(totalNumbersStr)
             if (!isNaN(tn)) {
-                totalNumbers = tn > 60 ? 60 : tn
+                totalNumbers = tn > MAX_NUMBERS ? MAX_NUMBERS : tn
             }
         }
 
         if (totalGamesStr) {
             const tg = parseInt(totalGamesStr)
             if (!isNaN(tg)) {
-                totalGames = tg > 100 ? 100 : tg
+                totalGames = tg > MAX_GAMES ? MAX_GAMES : tg
             }
         }
 
@@ -39,14 +42,17 @@ export class ApostaCommand extends Command {
                 for (const number of generatedNumbers) {
                     if (!numbers.includes(number)) {
                         numbers.push(number)
+                        if(numbers.length === totalNumbers) break;
                     }
                 }
-                const remainingToGenerate = totalNumbers - numbers.length
+                let remainingToGenerate = totalNumbers - numbers.length
                 while (remainingToGenerate > 0) {
                     let newNumber = await RandomService.getRandomNumbers(totalNumbers, lowerBand, upperBand);
                     for (const number of newNumber) {
                         if (!numbers.includes(number)) {
                             numbers.push(number)
+                            remainingToGenerate = totalNumbers - numbers.length
+                            if(remainingToGenerate === 0) break;
                         }
                     }
                 }
