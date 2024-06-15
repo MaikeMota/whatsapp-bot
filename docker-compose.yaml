@@ -4,6 +4,7 @@ services:
     image: ghcr.io/maikemota/whatsapp-bot:latest
     environment:
       - FCS_API_KEYS=${FCS_API_KEYS}
+      - BRAPI_KEY=${BRAPI_KEY}
       - OPEN_WHEATER_KEY=${OPEN_WHEATER_KEY}
       - NODE_ENV=${NODE_ENV}
       - TZ=${TZ}
