@@ -184,7 +184,7 @@ const handleMessage = async (msg: Message) => {
 
     if (typeof msg.body === 'string') {
 
-        const [command, ...argsArray] = msg.body.split(" ").map(a => a.trim()).filter(arg => !!arg.trim());
+        const [command, ...argsArray] = msg.body.replace(/\xA0/g," ").split(" ").map(a => a.trim()).filter(arg => !!arg.trim());
         const handler = RegisteredHandlers[command]
         if (handler) {
             console.info(`Message contains a registered command ${command}`);
