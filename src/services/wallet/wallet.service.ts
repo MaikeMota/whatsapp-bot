@@ -38,7 +38,7 @@ export class WalletService {
             this.cache[key].wallet = await this.stateSaver.load(this.resolveKey(key));
             this.cache[key].lastUpdateTime = Date.now();
         }
-        if (!this.cache[key] || Object.keys(this.cache[key].wallet).length == 0) {
+        if (Object.keys(this.cache[key].wallet).length == 0) {
             return Promise.reject(WalletService.WALLET_NOT_REGISTERED_YET);
         }
         return this.cache[key].wallet;
@@ -50,10 +50,6 @@ export class WalletService {
         const alreadyExists = !!actualPosition;
 
         let cachedWallet = this.cache[key];
-        if (!cachedWallet) {
-            cachedWallet = { wallet: {}, lastUpdateTime: 0 }
-            this.cache[key] = cachedWallet
-        }
         cachedWallet.wallet[updatedPosition.ticker] = updatedPosition;
         await this.saveState(key, cachedWallet.wallet)
         cachedWallet.lastUpdateTime = Date.now();
