@@ -29,7 +29,6 @@ export class WalletAddEarningCommand extends Command {
             await msg.reply(`Proventos para ${ticker} atualizados com sucesso! Total já pago para o ativo: ${formatToBRL(position.dpaPago)}`)
         } catch (error) {
             await msg.reply(error);
-            return;
         }
     }
 }

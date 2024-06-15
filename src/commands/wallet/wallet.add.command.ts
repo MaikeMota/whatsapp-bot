@@ -34,7 +34,7 @@ export class WalletAddCommand extends Command {
 
             const alreadyExists = await this.walletService.updatePosition(contactId, newPosition);
 
-            await msg.reply(`${ticker.toUpperCase()} ${bold(alreadyExists ? 'Adicionado' : 'Atualizado')} com sucesso!`)
+            await msg.reply(`${ticker.toUpperCase()} ${bold(alreadyExists ? 'Atualizado' : 'Adicionado')} com sucesso!`)
         } catch (error) {
             await msg.reply(error);
             return;

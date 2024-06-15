@@ -3,6 +3,11 @@ import { JSONStateSaver } from "../../utils/json-state-saver";
 import { Wallet } from "./wallet.interface";
 import { WalletPosition } from "./wallet.position.interface";
 
+interface CachedWallet {
+    wallet: Wallet,
+    lastUpdateTime: number
+}
+
 export class WalletService {
 
     private static readonly TICKER_PLACEHOLDER = '{ticker}';
@@ -11,9 +16,7 @@ export class WalletService {
 
     private stateSaver: StateSaver<Wallet> = new JSONStateSaver<Wallet>();
 
-    private cachedWallet: Wallet;
-    private lastUpdateTime: number;
-
+    private cache: { [key: string]: CachedWallet } = {};
     async getPosition(key: string, ticker: string) {
         try {
             const wallet = await this.getWallet(key);
@@ -28,14 +31,17 @@ export class WalletService {
     }
 
     async getWallet(key: string): Promise<Wallet> {
-        if(!this.cachedWallet || this.lastUpdateTime < Date.now() - (1000 * 60)) {
-            this.cachedWallet = await this.stateSaver.load(this.resolveKey(key));
-            this.lastUpdateTime = Date.now();
+        if (!this.cache[key]) {
+            this.cache[key] = { wallet: {}, lastUpdateTime: 0 }
         }
-        if (!this.cachedWallet) {
+        if (this.cache[key].lastUpdateTime < Date.now() - (1000 * 60)) {
+            this.cache[key].wallet = await this.stateSaver.load(this.resolveKey(key));
+            this.cache[key].lastUpdateTime = Date.now();
+        }
+        if (!this.cache[key] || Object.keys(this.cache[key].wallet).length == 0) {
             return Promise.reject(WalletService.WALLET_NOT_REGISTERED_YET);
         }
-        return this.cachedWallet;
+        return this.cache[key].wallet;
     }
 
     async updatePosition(key: string, updatedPosition: WalletPosition) {
@@ -43,8 +49,14 @@ export class WalletService {
         let actualPosition = await this.getPosition(key, updatedPosition.ticker).catch(e => undefined);
         const alreadyExists = !!actualPosition;
 
-        this.cachedWallet[updatedPosition.ticker] = updatedPosition;
-        await this.saveState(key)
+        let cachedWallet = this.cache[key];
+        if (!cachedWallet) {
+            cachedWallet = { wallet: {}, lastUpdateTime: 0 }
+            this.cache[key] = cachedWallet
+        }
+        cachedWallet.wallet[updatedPosition.ticker] = updatedPosition;
+        await this.saveState(key, cachedWallet.wallet)
+        cachedWallet.lastUpdateTime = Date.now();
         return alreadyExists;
     }
 
@@ -52,21 +64,21 @@ export class WalletService {
         let actualPosition = await this.getPosition(key, ticker).catch(e => undefined);
         const alreadyExists = !!actualPosition;
 
-        if(!alreadyExists) {
+        if (!alreadyExists) {
             return Promise.reject(WalletService.TICKER_NOT_REGISTERED_YET.replace(WalletService.TICKER_PLACEHOLDER, ticker));
         }
 
-        this.cachedWallet[ticker] = undefined;
+        this.cache[key][ticker] = undefined;
 
-        await this.saveState(key);
+        await this.saveState(key, this.cache[key].wallet);
     }
 
-    private async saveState(key: string) {
-        await this.stateSaver.save(this.resolveKey(key), this.cachedWallet);
+    private async saveState(key: string, state: Wallet) {
+        await this.stateSaver.save(this.resolveKey(key), state);
     }
 
     private resolveKey(key: string) {
-        return `./wallets/${key}/wallet`;
+        return `./wallets/${key}`;
     }
 
 }
