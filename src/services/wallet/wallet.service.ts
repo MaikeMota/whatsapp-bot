@@ -64,7 +64,7 @@ export class WalletService {
             return Promise.reject(WalletService.TICKER_NOT_REGISTERED_YET.replace(WalletService.TICKER_PLACEHOLDER, ticker));
         }
 
-        this.cache[key][ticker] = undefined;
+        delete this.cache[key][ticker];
 
         await this.saveState(key, this.cache[key].wallet);
     }
