@@ -1,6 +1,6 @@
 import { formatToBRL, formatToNumber } from "brazilian-values";
 import { Chat, Client, Message } from "whatsapp-web.js";
-import { getStockInfo } from "../../services/fcs-api.service";
+import { getStockInfo } from "../../services/brapi.service";
 import { StockInfo } from "../../services/stock-info.interface";
 import { Wallet } from "../../services/wallet/wallet.interface";
 import { WalletPosition } from "../../services/wallet/wallet.position.interface";
