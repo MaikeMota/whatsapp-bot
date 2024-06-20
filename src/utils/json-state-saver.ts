@@ -26,7 +26,6 @@ export class JSONStateSaver<T> implements StateSaver<T> {
             const json = readFileSync(filePath, { encoding: FILE_ENCODING });
             return JSON.parse(json) as T;
         }
-        return {} as T;
     }
 
     private resolveFilePath(key: string) {
