@@ -16,7 +16,7 @@ export class GroupAdminUnlockerRunner implements Runner {
     async run(client: Client): Promise<void> {
         const state = await this.stateSaver.load(this.runnerName);
         const now = new Date().getTime();
-        if (state) {
+        if (state && state.toUnlock) {
             for (const toUnlock of state.toUnlock) {
                 if (toUnlock.unlockTime < now) {
                     const gChat = await client.getChatById(toUnlock.groupId) as GroupChat;
