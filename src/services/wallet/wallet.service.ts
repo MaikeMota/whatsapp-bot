@@ -36,6 +36,9 @@ export class WalletService {
         }
         if (this.cache[key].lastUpdateTime < Date.now() - (1000 * 60)) {
             this.cache[key].wallet = await this.stateSaver.load(this.resolveKey(key));
+            if(!this.cache[key].wallet) { 
+                this.cache[key].wallet = {}
+            }
             this.cache[key].lastUpdateTime = Date.now();
         }
         if (Object.keys(this.cache[key].wallet).length == 0) {
