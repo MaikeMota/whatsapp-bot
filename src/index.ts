@@ -99,9 +99,9 @@ client.on('authenticated', async () => {
 
     handlers.forEach((handlerConstructor) => {
         const handler = new handlerConstructor();
-        registerCommand(handler.command, handler, RegisteredHandlers);
+        registerCommand(normalizeCommand(handler.command), handler, RegisteredHandlers);
         for (const command of handler.alternativeCommands) {
-            registerCommand(command, handler, RegisteredHandlers);
+            registerCommand(normalizeCommand(command), handler, RegisteredHandlers);
         }
     });
 
@@ -154,8 +154,15 @@ const runners: Constructor<Runner>[] = [
     //RadarAlertsRunner
 ];
 
+const normalizeCommand = (command: string) => {
+    if(!IS_PRODUCTION) {
+        command += '-dev';
+    }    
+    return command.toLocaleLowerCase()
+}
+
 const registerCommand = (command: string, handler: Command, handlers: CommandMap) => {
-    command = IS_PRODUCTION ? command : `${command}-dev`
+
     if (handlers[command]) {
         console.error(`Já existe um handler para o comando ${command}`)
     } else {
@@ -185,17 +192,18 @@ const handleMessage = async (msg: Message) => {
     if (typeof msg.body === 'string') {
 
         const [command, ...argsArray] = msg.body.replace(/\xA0/g," ").split(" ").map(a => a.trim()).filter(arg => !!arg.trim());
-        const handler = RegisteredHandlers[command]
+        const normalizedCommand = normalizeCommand(command)
+        const handler = RegisteredHandlers[normalizedCommand]
         if (handler) {
-            console.info(`Message contains a registered command ${command}`);
+            console.info(`Message contains a registered command ${normalizedCommand}`);
             //if (await handler.isUseAllowed(chat.id._serialized, chat.isGroup)) {
                 
                 if (await handler.isUsageValid(chat, msg, ...argsArray)) {
                     try {
-                        console.info(`Calling handler for ${command}`);
+                        console.info(`Calling handler for ${normalizedCommand}`);
                         await handler.handle(client, chat, msg, ...argsArray);
                     } catch (e) {
-                        console.error(`Erro ao processar comando ${command}`)
+                        console.error(`Erro ao processar comando ${normalizedCommand}`)
                         console.error(e);
                     }
                 } else {
