@@ -14,7 +14,7 @@ RUN node ./node_modules/puppeteer/install.js
 RUN npm run build
 
 
-from builder
+FROM builder
 
 WORKDIR /app/
 
