@@ -99,9 +99,9 @@ client.on('authenticated', async () => {
 
     handlers.forEach((handlerConstructor) => {
         const handler = new handlerConstructor();
-        registerCommand(normalizeCommand(handler.command), handler, RegisteredHandlers);
+        registerCommand(normalizeCommand(handler.command, true), handler, RegisteredHandlers);
         for (const command of handler.alternativeCommands) {
-            registerCommand(normalizeCommand(command), handler, RegisteredHandlers);
+            registerCommand(normalizeCommand(command, true), handler, RegisteredHandlers);
         }
     });
 
@@ -154,8 +154,8 @@ const runners: Constructor<Runner>[] = [
     //RadarAlertsRunner
 ];
 
-const normalizeCommand = (command: string) => {
-    if(!IS_PRODUCTION) {
+const normalizeCommand = (command: string, forRegister: boolean = false) => {
+    if(forRegister && !IS_PRODUCTION) {
         command += '-dev';
     }    
     return command.toLocaleLowerCase()
