@@ -88,9 +88,9 @@ client.on('authenticated', async () => {
 
     handlers.forEach((handlerConstructor) => {
         const handler = new handlerConstructor();
-        registerCommand(normalizeCommand(handler.command, true), handler, RegisteredHandlers);
+        registerCommand(registerNormalizedCommand(handler.command), handler, RegisteredHandlers);
         for (const command of handler.alternativeCommands) {
-            registerCommand(normalizeCommand(command, true), handler, RegisteredHandlers);
+            registerCommand(registerNormalizedCommand(command), handler, RegisteredHandlers);
         }
     });
 
@@ -143,11 +143,15 @@ const runners: Constructor<Runner>[] = [
     //RadarAlertsRunner
 ];
 
-const normalizeCommand = (command: string, forRegister: boolean = false) => {
-    if(forRegister && !IS_PRODUCTION) {
+const normalizeCommand = (command: string) => {
+    return command?.toLocaleLowerCase()
+}
+
+const registerNormalizedCommand = (command: string) => { 
+    if(!IS_PRODUCTION) {
         command += '-dev';
-    }    
-    return command.toLocaleLowerCase()
+    }
+    return normalizeCommand(command)
 }
 
 const registerCommand = (command: string, handler: Command, handlers: CommandMap) => {
