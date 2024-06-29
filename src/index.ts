@@ -56,23 +56,12 @@ import { Runner } from './runners/interfaces/runner.interface';
 import { randomIntFromInterval } from './utils/util';
 import { isId } from './utils/whatsapp.util';
 
-const USE_WEB_CACHE_VERSION = process.env.USE_WEB_CACHE_VERSION
-
 const config = {
     authStrategy: new LocalAuth({ clientId: IS_PRODUCTION ? WCLIENT_ID : undefined, dataPath: IS_PRODUCTION ? "/app/auth_data" : undefined }),
     puppeteer: {
         args: ['--no-sandbox'],
     }
 }
-
-if (USE_WEB_CACHE_VERSION) {
-    console.log("Using web cache version ", USE_WEB_CACHE_VERSION)
-    config['webVersionCache'] = {
-        type: 'remote',
-        remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/${USE_WEB_CACHE_VERSION}.html`,
-    }
-}
-
 
 const client = new Client(config);
 
