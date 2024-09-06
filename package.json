@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@deepgram/sdk": "^1.21.0",
+    "@deepgram/sdk": "^3.0.0",
     "brazilian-values": "^0.13.0",
     "dotenv": "^16.3.1",
     "lerolero": "^0.1.0",
