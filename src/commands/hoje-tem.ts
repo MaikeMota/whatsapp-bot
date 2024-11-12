@@ -34,10 +34,17 @@ const ALMOST_THERE = ["Calma, estamos quase lá, amanhã tem... se não chover X
     
 
 
-A menos que chova né 😶‍🌫️...`,];
+A menos que chova né 😶‍🌫️...`,
+"Antes não tinha, ai passou a ter, mas agora parece que não tem mais, volte na quinta.",];
 
 const TODAY_IS_THE_DAY = ["Hoje tem!", "Mas claro!", "só colar", "Buteco tá aberto já!"];
-const TODAY_IS_THE_DAY_BUT = ["Era pra ter, mas tá com cara de chuva...", "Veremos se não vai choover...", "Tem, mas se chover...."]
+const TODAY_IS_THE_DAY_BUT = ["Era pra ter, mas tá com cara de chuva...", "Veremos se não vai choover...", "Tem, mas se chover....",
+"Parece que o tempo vai fechar, melhor adiarmos pra um dia mais tranquilo...",
+"Vi a previsão aqui e vai chover. Vamos remarcar...",
+"Com essa chuva toda, acho melhor deixarmos pra outro dia, né?",
+"Olhei o tempo e vai chover, melhor deixar pra outro dia.",
+"A previsão é de chuva. Que tal a gente combinar em um dia mais seco?"
+]
 
 export class HojeTemCommand extends Command {
     command = '/hoje-tem?';
