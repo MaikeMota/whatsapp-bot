@@ -5,7 +5,7 @@ async function getWheater(city) {
     if (result.cod === '200') {
         const [today] = result.list;
         const { temp, temp_min, temp_max, humidity, feels_like } = today.main;
-        return { temp, temp_min, temp_max, humidity, feels_like };
+        return { temp, temp_min, temp_max, humidity, feels_like, hasChanceToRain: today.pop > 0 };
     }
     return null;
 }
