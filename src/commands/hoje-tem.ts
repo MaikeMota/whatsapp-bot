@@ -41,7 +41,7 @@ const TODAY_IS_THE_DAY_BUT = ["Era pra ter, mas tá com cara de chuva...", "Vere
 
 export class HojeTemCommand extends Command {
     command = '/hoje-tem?';
-    alternativeCommands: string[] = ["/hoje-tem?", "/hoje-tem", "hoje-tem?", "hoje-tem"];
+    alternativeCommands: string[] = ["/hoje-tem?", "/hoje-tem", "hoje-tem?", "hoje-tem", "hojetem", "/hojetem"];
 
     usageDescription = ''
 
