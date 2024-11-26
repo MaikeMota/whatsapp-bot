@@ -3,8 +3,8 @@ import { Command } from "./command";
 
 import * as cheerio from 'cheerio';
 
-export class GlobinCommand extends Command {
-    command = '/globin';
+export class GoblinCommand extends Command {
+    command = '/goblin';
     alternativeCommands: string[] = [];
 
     usageDescription = ''
