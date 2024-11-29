@@ -11,7 +11,11 @@ export class GoblinCommand extends Command {
 
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
 
-        const response = await fetch('https://www.quiknotes.in/goblin-mine-game-code-29-november-2024/').then(r => r.text());
+        const date = new Date();
+        const day = date.getDate();
+        const month = date.toLocaleString('en-us', { month: 'long' }).toLowerCase();
+        const year = date.getFullYear();
+        const response = await fetch(`https://www.quiknotes.in/goblin-mine-game-code-${day}-${month}-${year}/`).then(r => r.text());
 
         const $ = cheerio.load(response);
 
