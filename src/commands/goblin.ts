@@ -11,11 +11,11 @@ export class GoblinCommand extends Command {
 
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
 
-        const response = await fetch('https://coinmarketcap.com/academy/article/todays-goblin-mine-daily-cipher-code-november-22-2024/').then(r => r.text());
+        const response = await fetch('https://www.quiknotes.in/goblin-mine-game-code-29-november-2024/').then(r => r.text());
 
         const $ = cheerio.load(response);
 
-        const matchs = $('h2 + div').text().match(/\[ (?<code>\d{4}) \]/);
+        const matchs = $('.entry-content.clear').text().match(/Today’s Code: (?<code>[0-9]{4})/);
 
         const message = matchs ? `Goblin Mine Daily Cipher Code: ${matchs.groups.code}` : 'Nenhuma chave encontrada.';
 
