@@ -8,7 +8,7 @@ import { Runner } from "../interfaces/runner.interface";
 export const EMMA_TRACKER_RUNNER_NAME = "EmmaTracker";
 
 const TRACKING_CODE = process.env.EMMA_TRACKING_CODE;
-const CHAT_ID = process.env.EMMA_TRACKER_CHAT_ID;
+const CHAT_IDS = process.env.EMMA_TRACKER_CHAT_IDS.split(',');
 
 export class EmmaTrackerRunner implements Runner {
 
@@ -35,10 +35,12 @@ export class EmmaTrackerRunner implements Runner {
             }
         }
         if(lastSaveState.title !== lastStateTitle || lastSaveState.date !== lastStateDate || lastSaveState.lastDeliveryPreviewDate !== deliveryPreviewDate) {
-            await client.sendMessage(CHAT_ID, `
-                Houve uma nova atualização no tracker: ${bold(lastStateDate)} - ${bold(lastStateTitle)}
-                Previsão de entrega: ${bold(deliveryPreviewDate)}`)
-        };
+            for(const chatId of CHAT_IDS){ 
+                await client.sendMessage(chatId, `
+                    Houve uma nova atualização no tracker: ${bold(lastStateDate)} - ${bold(lastStateTitle)}
+                    Previsão de entrega: ${bold(deliveryPreviewDate)}`)
+            };
+            }
     }
 
     shutdown(): Promise<void> {
