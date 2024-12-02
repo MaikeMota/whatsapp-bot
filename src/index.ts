@@ -55,6 +55,8 @@ import { WalletCommand } from './commands/wallet/wallet.command';
 import { GroupAdminUnlockerRunner } from './runners/group-admin/unlocker.runner';
 
 import { Runner } from './runners/interfaces/runner.interface';
+
+import { EmmaTrackerRunner } from './runners/emma-tracker/emma-tracker.runner';
 import { randomIntFromInterval } from './utils/util';
 import { isId } from './utils/whatsapp.util';
 
@@ -144,6 +146,7 @@ const handlers: Constructor<Command>[] = [
 
 const runners: Constructor<Runner>[] = [
     GroupAdminUnlockerRunner,
+    EmmaTrackerRunner,
     //RadarAlertsRunner
 ];
 
