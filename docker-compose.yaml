@@ -27,6 +27,8 @@ services:
       - WCLIENT_ID=${WCLIENT_ID}
       - USE_WEB_CACHE_VERSION=${USE_WEB_CACHE_VERSION}
       - RANDOM_ORG_API_KEYS=${RANDOM_ORG_API_KEYS}
+      - EMMA_TRACKING_CODE=${EMMA_TRACKING_CODE}
+      - EMMA_TRACKER_CHAT_IDS=${EMMA_TRACKER_CHAT_IDS}
     volumes:
       - type: bind
         source: ${AUTH_FOLDER}
