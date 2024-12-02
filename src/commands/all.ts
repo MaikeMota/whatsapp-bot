@@ -1,5 +1,5 @@
 import { Client, GroupChat, Message } from "whatsapp-web.js";
-import { extractContactId, userIsGroupAdmin } from "../utils/whatsapp.util";
+import { extractContactId, userIsGroupAdmin } from '../utils/whatsapp.util';
 import { Command } from "./command";
 
 const ALL_COMMAND_INTERVAL_IN_MINUTES = parseInt((process.env.ALL_COMMAND_INTERVAL_IN_MINUTES || `5`))
@@ -47,7 +47,14 @@ export class MentionAllCommand extends Command {
             text += ` @${participant.id.user}`;
         }
         this.setLastUsage(key, now);
-        await chat.sendMessage(text, { mentions });
+        const quotedMsg = await msg.getQuotedMessage();
+
+        if(quotedMsg) {
+            quotedMsg.reply(text, chat.id._serialized, { mentions });
+        }else { 
+            await chat.sendMessage(text, { mentions });
+        }
+
     }
 
     private setLastWarning(key: string, now: number) {
