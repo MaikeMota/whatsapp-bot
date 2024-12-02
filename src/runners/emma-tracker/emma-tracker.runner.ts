@@ -22,11 +22,11 @@ export class EmmaTrackerRunner implements Runner {
         const response = await fetch(trackerUrl).then(r => r.text());
 
         const $ = cheerio.load(response);
-        const lastStateFromPage =  $('.MuiCardContent-root .timeline li').first();
+        const lastStateFromPage = $('.MuiCardContent-root .timeline li').first();
         const deliveryPreviewDate = $('.MuiTypography-root.MuiTypography-h4.MuiTypography-colorTextPrimary').text().split(' - ')[1]?.match(/(?<date>[0-9]{2}\/[0-9]{2}\/[0-9]{4})/)?.groups?.date
         const [lastStateTitle, lastStateDate] = lastStateFromPage.text().split('\n');
         let lastSaveState = await this.stateSaver.load(this.runnerName);
-        if(!lastSaveState) {
+        if (!lastSaveState) {
             lastSaveState = {
                 title: '',
                 date: '',
@@ -34,13 +34,17 @@ export class EmmaTrackerRunner implements Runner {
 
             }
         }
-        if(lastSaveState.title !== lastStateTitle || lastSaveState.date !== lastStateDate || lastSaveState.lastDeliveryPreviewDate !== deliveryPreviewDate) {
-            for(const chatId of CHAT_IDS){ 
+        if (lastSaveState.title !== lastStateTitle || lastSaveState.date !== lastStateDate || lastSaveState.lastDeliveryPreviewDate !== deliveryPreviewDate) {
+            lastSaveState.date = lastStateDate;
+            lastSaveState.title = lastStateTitle;
+            lastSaveState.lastDeliveryPreviewDate = deliveryPreviewDate;
+            await this.stateSaver.save(this.runnerName, lastSaveState);
+            for (const chatId of CHAT_IDS) {
                 await client.sendMessage(chatId, `
                     Houve uma nova atualização no tracker: ${bold(lastStateDate)} - ${bold(lastStateTitle)}
                     Previsão de entrega: ${bold(deliveryPreviewDate)}`)
-            };
             }
+        }
     }
 
     shutdown(): Promise<void> {
@@ -49,7 +53,7 @@ export class EmmaTrackerRunner implements Runner {
 }
 
 export interface EmmaTrackerState {
-   title: string;
-   date: string;
-   lastDeliveryPreviewDate: string;
+    title: string;
+    date: string;
+    lastDeliveryPreviewDate: string;
 }
