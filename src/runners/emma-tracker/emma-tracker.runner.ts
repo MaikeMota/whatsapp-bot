@@ -29,7 +29,7 @@ export class EmmaTrackerRunner implements Runner {
             status: { description }
         } = await response.json();
 
-        const deliveryPreviewDate = new Date(delivery_date + ' 00:00:00').toLocaleDateString();
+        const deliveryPreviewDate = new Date(delivery_date + ' 00:00:00').toLocaleDateString('pt-BR');
         const lastStateTitle = lastStateFromApi.message;
         const lastOcurrenceDate = new Date(lastStateFromApi.occurred_at);
         const lastStateDate = lastOcurrenceDate.toLocaleDateString('pt-BR') + ' ' + lastOcurrenceDate.toLocaleTimeString('pt-BR');
