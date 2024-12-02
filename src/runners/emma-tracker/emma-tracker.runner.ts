@@ -1,4 +1,3 @@
-import * as cheerio from 'cheerio';
 import { Client } from "whatsapp-web.js";
 import { JSONStateSaver } from "../../utils/json-state-saver";
 import { bold } from '../../utils/whatsapp.util';
@@ -18,31 +17,46 @@ export class EmmaTrackerRunner implements Runner {
     stateSaver = new JSONStateSaver<EmmaTrackerState>();
 
     async run(client: Client): Promise<void> {
-        const trackerUrl = `https://app.flixlog.com/tracking/${TRACKING_CODE}`;
-        const response = await fetch(trackerUrl).then(r => r.text());
+        const trackerUrl = `https://api-v2.flixlog.com/tracking/${TRACKING_CODE}`;
+        const response = await fetch(trackerUrl, { method: 'POST' });
+        const {
+            tracker: {
+                details: [
+                    lastStateFromApi
+                ]
+            },
+            delivery: { delivery_date },
+            status: { description }
+        } = await response.json();
 
-        const $ = cheerio.load(response);
-        const lastStateFromPage = $('.MuiCardContent-root .timeline li').first();
-        const deliveryPreviewDate = $('.MuiTypography-root.MuiTypography-h4.MuiTypography-colorTextPrimary').text().split(' - ')[1]?.match(/(?<date>[0-9]{2}\/[0-9]{2}\/[0-9]{4})/)?.groups?.date
-        const [lastStateTitle, lastStateDate] = lastStateFromPage.text().split('\n');
+        const deliveryPreviewDate = new Date(delivery_date + ' 00:00:00').toLocaleDateString();
+        const lastStateTitle = lastStateFromApi.message;
+        const lastOcurrenceDate = new Date(lastStateFromApi.occurred_at);
+        const lastStateDate = lastOcurrenceDate.toLocaleDateString('pt-BR') + ' ' + lastOcurrenceDate.toLocaleTimeString('pt-BR');
+
         let lastSaveState = await this.stateSaver.load(this.runnerName);
         if (!lastSaveState) {
             lastSaveState = {
                 title: '',
                 date: '',
-                lastDeliveryPreviewDate: ''
+                deliveryPreviewDate: '',
+                status: ''
 
             }
         }
-        if (lastSaveState.title !== lastStateTitle || lastSaveState.date !== lastStateDate || lastSaveState.lastDeliveryPreviewDate !== deliveryPreviewDate) {
+        if (lastSaveState.title !== lastStateTitle || lastSaveState.date !== lastStateDate || lastSaveState.deliveryPreviewDate !== deliveryPreviewDate || lastSaveState.status !== description) {
             lastSaveState.date = lastStateDate;
             lastSaveState.title = lastStateTitle;
-            lastSaveState.lastDeliveryPreviewDate = deliveryPreviewDate;
+            lastSaveState.deliveryPreviewDate = deliveryPreviewDate;
+            lastSaveState.status = description;
             await this.stateSaver.save(this.runnerName, lastSaveState);
             for (const chatId of CHAT_IDS) {
-                await client.sendMessage(chatId, `
-                    Houve uma nova atualização no tracker: ${bold(lastStateDate)} - ${bold(lastStateTitle)}
-                    Previsão de entrega: ${bold(deliveryPreviewDate)}`)
+                await client.sendMessage(chatId, `Houve uma nova atualização no tracker: 
+
+Status: ${bold(lastSaveState.status)}
+Previsão de entrega: ${bold(lastSaveState.deliveryPreviewDate)}
+${bold(lastSaveState.date)} -> ${bold(lastSaveState.title)}
+`)
             }
         }
     }
@@ -55,5 +69,6 @@ export class EmmaTrackerRunner implements Runner {
 export interface EmmaTrackerState {
     title: string;
     date: string;
-    lastDeliveryPreviewDate: string;
+    deliveryPreviewDate: string;
+    status: string;
 }
