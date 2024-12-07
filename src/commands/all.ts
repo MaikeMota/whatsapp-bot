@@ -1,5 +1,6 @@
 import { Client, GroupChat, Message } from "whatsapp-web.js";
-import { extractContactId, userIsGroupAdmin } from '../utils/whatsapp.util';
+import { JSONStateSaver } from "../utils/json-state-saver";
+import { bold, extractContactId, userIsGroupAdmin } from '../utils/whatsapp.util';
 import { Command } from "./command";
 
 const ALL_COMMAND_INTERVAL_IN_MINUTES = parseInt((process.env.ALL_COMMAND_INTERVAL_IN_MINUTES || `5`))
@@ -7,11 +8,16 @@ const ALL_COMMAND_INTERVAL_IN_MINUTES = parseInt((process.env.ALL_COMMAND_INTERV
 const INTERVAL_BETWEEN_USES = ALL_COMMAND_INTERVAL_IN_MINUTES * 60 * 1000
 
 const lastUses = {}
-const lastWarnings = {}
+
+interface AllMentionGroup {
+    [chatId: string]: { [key: string]: { user: string, id: string }[]; }
+}
 
 export class MentionAllCommand extends Command {
     command = '@all';
     alternativeCommands = ['@todos']
+
+    stateSaver = new JSONStateSaver<AllMentionGroup>();
 
     async handle(client: Client, chat: GroupChat, msg: Message, ...argsArray: string[]): Promise<void> {
 
@@ -21,57 +27,148 @@ export class MentionAllCommand extends Command {
 
         const isFromGroupAdmin = await userIsGroupAdmin(msg, chat)
 
+        const contactId = await extractContactId(msg);
         if (!msg.fromMe && !isFromGroupAdmin) {
-            const contactId = await extractContactId(msg);
-            msg.reply("Somente administradores podem usar este comando.", contactId);
-            console.log(`Usuário ${contactId} tentou usar o comando @all no grupo ${chat.name} porem não é um administrador.`)
+            await msg.react('👎');
+            await msg.reply("Somente administradores podem usar este comando.", contactId);
+            console.log(`Usuário ${contactId} tentou usar o comando @all no grupo ${chat.name} porem não é um administrador.`);
             return;
+        }
+
+        const [maybeSubcommand, ...subCommandArgs] = argsArray;
+
+        if (maybeSubcommand) {
+            const [groupName, adtionalCommand, ...adtionalArgs] = subCommandArgs;
+            let group = await this.getGroup(chat.id._serialized, groupName);
+            const mentionedContacts = await msg.getMentions();
+            switch (maybeSubcommand) {
+                case 'add_to_group':
+                case 'add': {
+                    if (mentionedContacts.length === 0) {
+                        await msg.react('👎');
+                        await msg.reply(`Nenhum contato foi mencionado para ser adicionado ao grupo ${bold(groupName)} para o chat ${bold(chat.name)}`, contactId);
+                        return
+                    }
+                    mentionedContacts.push(await msg.getContact());
+                    for (let contact of mentionedContacts) {
+                        if (!group.find(g => g.id === contact.id._serialized)) {
+                            group.push({ user: contact.id.user, id: contact.id._serialized });
+                        }
+                    }
+                    await this.saveGroup(chat.id._serialized, groupName, group);
+                    await msg.reply(`Adicionado ${mentionedContacts.map(c => c.id.user).join(', ')} ao grupo ${bold(groupName)} para o chat ${bold(chat.name)}`, contactId);
+                    await msg.react('👍');
+                    return;
+                }
+                case 'remove_from_group':
+                case 'remove': {
+                    if (adtionalCommand === 'all') {
+                        group = [];
+                    } else {
+                        if (mentionedContacts.length === 0) {
+                            await msg.react('👎');
+                            await msg.reply(`Nenhum contato foi mencionado para ser removido do grupo ${bold(groupName)} para o chat ${bold(chat.name)}`, contactId);
+                            return
+                        }
+                        for (let contact of mentionedContacts) {
+                            group = group.filter(g => g.id !== contact.id._serialized);
+                        }
+                    }
+                    await this.saveGroup(chat.id._serialized, groupName, group);
+                    await msg.react('👍');
+                    await msg.reply(`Removido ${group.length === 0 ? 'todos' : mentionedContacts.map(c => c.id.user).join(', ')} do grupo ${bold(groupName)} para o chat ${bold(chat.name)}`, contactId);
+                    return;
+                }
+                case 'list':
+                case 'list_groups': {
+                    const allRegisteredChats = await this.stateSaver.load('all_groups');
+                    const allGroupsForChat = allRegisteredChats[chat.id._serialized];
+                    if (!allGroupsForChat) {
+                        await msg.react('👎');
+                        await msg.reply(`Não foi encontrado nenhum grupo para o chat ${bold(chat.name)}`, contactId);
+                        return
+                    }
+                    await msg.react('👍');
+                    await msg.reply(`Os seguintes grupos foram encontrados para o chat ${bold(chat.name)}:\n\n${Object.keys(allGroupsForChat).map(name => bold(name)).join('\n')}`, contactId);
+                    return;
+                }
+            }
         }
 
         const key = `${chat.id}-${msg.author}`
         const now = Date.now();
 
-        if (this.hadUsedRecently(key, now)) {
-            if (this.hasBeenWarned(key, now)) {
-                return;
-            }
-            this.setLastWarning(key, now);
-            await msg.reply("Você não pode marcar todo mundo com tanta frequência!")
+        if (!msg.fromMe && this.hadUsedRecently(key, now)) {
+            await msg.react('👎');
+            await msg.reply("Você não pode marcar todo mundo com tanta frequência!", contactId);
             return;
         }
+
+        let usersToMention = chat.participants.map(p => { return { user: p.id.user, id: p.id._serialized } });
+
+
+        // at this point maybeSubcommand could be a group name
+        if (maybeSubcommand) {
+            const groupName = maybeSubcommand;
+            const group = await this.getGroup(chat.id._serialized, groupName);
+            if (group.length === 0) {
+                await msg.react('👎');
+                await msg.reply(`Não foi encontrado um grupo com o nome ${bold(groupName)} para o chat ${bold(chat.name)}`, contactId);
+                return;
+            }
+            usersToMention = group;
+        }
+
         let text = "";
         let mentions = [];
-
-        for (let participant of chat.participants) {
-            mentions.push(participant.id._serialized);
-            text += ` @${participant.id.user}`;
+        for (let participant of usersToMention) {
+            mentions.push(participant.id);
+            text += ` @${participant.user}`;
         }
+
         this.setLastUsage(key, now);
-        const quotedMsg = await msg.getQuotedMessage();
 
-        if(quotedMsg) {
-            quotedMsg.reply(text, chat.id._serialized, { mentions });
-        }else { 
-            await chat.sendMessage(text, { mentions });
-        }
+        const messageToReply = await msg.getQuotedMessage() || msg
 
-    }
+        await msg.react('👍');
+        await messageToReply.reply(text, chat.id._serialized, { mentions });
 
-    private setLastWarning(key: string, now: number) {
-        lastWarnings[key] = now;
     }
 
     private setLastUsage(key: string, now: number) {
         lastUses[key] = now;
     }
 
-    private hasBeenWarned(key: string, now: number) {
-        const lastWarning = lastWarnings[key];
-        return lastWarning && (now - lastWarning) < INTERVAL_BETWEEN_USES;
-    }
-
     private hadUsedRecently(key: string, now: number) {
         const lastUse = lastUses[key];
         return lastUse && (now - lastUse) < INTERVAL_BETWEEN_USES;
+    }
+
+    private
+
+    private async getGroup(chatId, groupName) {
+        let allRegisteredGroups = await this.stateSaver.load('all_groups');
+        if (!allRegisteredGroups) {
+            allRegisteredGroups = {};
+        }
+        if (!allRegisteredGroups[chatId]) {
+            allRegisteredGroups[chatId] = {};
+        }
+        if (!allRegisteredGroups[chatId][groupName]) {
+            allRegisteredGroups[chatId][groupName] = [];
+        }
+        return allRegisteredGroups[chatId][groupName];
+    }
+
+    private async saveGroup(chatId, groupName, users) {
+        let allRegisteredGroups = await this.stateSaver.load('all_groups');
+        if (!allRegisteredGroups) {
+            allRegisteredGroups = {};
+        }
+        if (!allRegisteredGroups[chatId]) {
+            allRegisteredGroups[chatId] = {};
+        }
+        allRegisteredGroups[chatId][groupName] = users;
+        await this.stateSaver.save('all_groups', allRegisteredGroups);
     }
 }
