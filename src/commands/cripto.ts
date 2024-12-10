@@ -22,8 +22,10 @@ export class CriptoCommand extends Command {
     async handle(client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
 
         const [args] = argsArray;
-        let [pair1] = args.split('/');
-        const pair2 = 'brl'
+        let [pair1, pair2] = args.split('/');
+        if(!pair2){ 
+            pair2 = 'brl'
+        }
 
         const ticker = `${pair1}/${pair2}`;
         const tickInfo = await getCriptoInfo(ticker)
