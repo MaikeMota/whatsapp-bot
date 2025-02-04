@@ -92,6 +92,28 @@ export class MentionAllCommand extends Command {
                     await msg.reply(`Os seguintes grupos foram encontrados para o chat ${bold(chat.name)}:\n\n${Object.keys(allGroupsForChat).map(name => bold(name)).join('\n')}`, contactId);
                     return;
                 }
+                case 'join': {
+                    const sender = await msg.getContact();
+                    if(!group.find(g => g.id === sender.id._serialized)) {
+                        group.push({ user: sender.id.user, id: sender.id._serialized });
+                        await this.saveGroup(chat.id._serialized, groupName, group);
+                        await msg.react('👍');
+                        await msg.reply(`Você entrou na lista '${bold(groupName)}' para o chat '${bold(chat.name)}'`, contactId);
+                        return;
+                    }
+                }
+                case 'leave': {
+                    const sender = await msg.getContact();
+                    if(group.find(g => g.id === sender.id._serialized)) {
+                        group = group.filter(g => g.id !== sender.id._serialized);
+                        await this.saveGroup(chat.id._serialized, groupName, group);
+                        await msg.react('👍');
+                        await msg.reply(`Você Saiu da lista '${bold(groupName)}' para o chat '${bold(chat.name)}'`, contactId);
+                        return;
+                    }else {
+                        await msg.reply(`Você não está na lista '${bold(groupName)}' para o chat '${bold(chat.name)}'`, contactId);
+                    }
+                }
             }
         }
 
@@ -143,9 +165,7 @@ export class MentionAllCommand extends Command {
         const lastUse = lastUses[key];
         return lastUse && (now - lastUse) < INTERVAL_BETWEEN_USES;
     }
-
-    private
-
+    
     private async getGroup(chatId, groupName) {
         let allRegisteredGroups = await this.stateSaver.load('all_groups');
         if (!allRegisteredGroups) {
