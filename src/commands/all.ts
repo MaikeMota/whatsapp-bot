@@ -106,6 +106,21 @@ export class MentionAllCommand extends Command {
                         return;
                     }else {
                         await msg.reply(`Você não está na lista '${bold(groupName)}' para o chat '${bold(chat.name)}'`, contactId);
+                        return;
+                    }
+                }
+                case 'membros':
+                case 'members': {
+                    if(group.length > 0) {
+                        await msg.react('👍');
+                        await msg.reply(`Membros da lista '${bold(groupName)}' para o chat '${bold(chat.name)}'
+
+* ${group.map(g => `${g.user}`).join('\n* ')}`, contactId);
+                        return;
+                    }else {
+                        await msg.react('👎');
+                        await msg.reply(`Nenhum membro na lista '${bold(groupName)}' para o chat '${bold(chat.name)}'`, contactId);
+                        return;
                     }
                 }
             }
@@ -122,7 +137,7 @@ export class MentionAllCommand extends Command {
 
         let usersToMention = chat.participants.map(p => { return { user: p.id.user, id: p.id._serialized } });
 
-
+        let usingNamedList = false;
         // at this point maybeSubcommand could be a group name
         if (maybeSubcommand) {
             const groupName = maybeSubcommand;
