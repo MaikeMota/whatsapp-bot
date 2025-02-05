@@ -86,6 +86,7 @@ export class MentionAllCommand extends Command {
                     await msg.reply(`Os seguintes grupos foram encontrados para o chat ${bold(chat.name)}:\n\n${Object.keys(allGroupsForChat).map(name => bold(name)).join('\n')}`, contactId);
                     return;
                 }
+                case 'entrar':
                 case 'join': {
                     const sender = await msg.getContact();
                     if(!group.find(g => g.id === sender.id._serialized)) {
@@ -96,6 +97,7 @@ export class MentionAllCommand extends Command {
                         return;
                     }
                 }
+                case 'sair':
                 case 'leave': {
                     const sender = await msg.getContact();
                     if(group.find(g => g.id === sender.id._serialized)) {
