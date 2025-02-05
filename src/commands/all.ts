@@ -28,12 +28,6 @@ export class MentionAllCommand extends Command {
         const isFromGroupAdmin = await userIsGroupAdmin(msg, chat)
 
         const contactId = await extractContactId(msg);
-        if (!msg.fromMe && !isFromGroupAdmin) {
-            await msg.react('👎');
-            await msg.reply("Somente administradores podem usar este comando.", contactId);
-            console.log(`Usuário ${contactId} tentou usar o comando @all no grupo ${chat.name} porem não é um administrador.`);
-            return;
-        }
 
         const [maybeSubcommand, ...subCommandArgs] = argsArray;
 
@@ -139,6 +133,15 @@ export class MentionAllCommand extends Command {
                 return;
             }
             usersToMention = group;
+            usingNamedList = true;
+        }
+
+
+        if (!usingNamedList && !msg.fromMe && !isFromGroupAdmin) {
+            await msg.react('👎');
+            await msg.reply("Somente administradores podem usar este comando.", contactId);
+            console.log(`Usuário ${contactId} tentou usar o comando @all geral no grupo ${chat.name} porem não é um administrador.`);
+            return;
         }
 
         let text = "";
