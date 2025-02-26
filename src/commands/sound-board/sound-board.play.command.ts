@@ -21,6 +21,8 @@ export class SoundBoardPlayCommand extends Command {
     async handle(_client: Client, chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
         const contactId = await extractContactId(msg);
 
+        const referencedMessage = await msg.getQuotedMessage();
+
         const [soundKey] = argsArray;
 
         if(!soundKey) {
@@ -41,7 +43,7 @@ export class SoundBoardPlayCommand extends Command {
 
         const sound = new MessageMedia('audio/mpeg', soundBoardState[soundKey].data);
         console.log(`Playing sound ${soundKey}`);
-        await msg.reply("", chat.id._serialized, { media: sound });
+        await (referencedMessage || msg).reply("", chat.id._serialized, { media: sound });
         console.log(`Sound ${soundKey} sent`);
     }
 
