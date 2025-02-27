@@ -55,13 +55,15 @@ export class SoundBoardAddCommand extends Command {
 
         soundBoardState[soundKey] = {
             data: media.data,
+            mimetype: media.mimetype,
             addedBy: contactId,
             addedAt: Date.now()
         }
 
         await this.stateSaver.save('soundboard', soundBoardState);
+        await msg.react('👍');
         await referencedMessage.reply(`O Som com a chave '${bold(soundKey)}' foi adicionado com sucesso!
-Para usa-lo, use o comando ${bold(`${this.parentCommand.command} ${soundKey}`)}`, contactId);
+Para usa-lo, use o comando ${bold(`${this.parentCommand.command} play ${soundKey}`)}`, contactId);
 
 
     }

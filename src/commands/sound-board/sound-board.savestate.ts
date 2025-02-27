@@ -1,5 +1,6 @@
 interface Sound {
     data: string;
+    mimetype: string;
     addedBy: string;
     addedAt: number;
 }
