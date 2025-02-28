@@ -37,6 +37,7 @@ export class SoundBoardPlayCommand extends Command {
 
         const exists = !!soundBoardState[soundKey];
         if(!exists) {
+            await msg.react('👎');
             await msg.reply(`Não existe um som com a chave '${bold(soundKey)}' no soundboard!`, contactId);
             return;
         }

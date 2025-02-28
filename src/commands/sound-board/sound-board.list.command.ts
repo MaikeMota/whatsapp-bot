@@ -48,6 +48,7 @@ export class SoundBoardListCommand extends Command {
 
         const message = soundList.join('\n');
         await msg.reply(message, contactId);
+        await msg.react('👍');
 
     }
 
