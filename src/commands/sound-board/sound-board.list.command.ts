@@ -43,7 +43,7 @@ export class SoundBoardListCommand extends Command {
         soundsEntry.sort(this.getSortFunction(sortBy, { requester: contactId }));
 
         const soundList = soundsEntry.map(([key, sound]) => {
-            return `${key} - ${sound.description} - ${pluralize(sound.reproductionCount, 'reprodução', 'reproduções', 'Nenhuma')}`;
+            return `${key} - ${sound.description? sound.description : 'Nenhuma descrição fornecida'} - ${pluralize(sound.reproductionCount, 'reprodução', 'reproduções', 'Nenhuma')}`;
         });
 
         const message = soundList.join('\n');

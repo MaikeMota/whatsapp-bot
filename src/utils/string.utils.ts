@@ -12,5 +12,5 @@ export function pluralize(value: number, singular: string, plural: string, zeroV
     if(value === 0) {
         return `${zeroValue} ${singular}`;
     }
-    return value === 1 ? singular : plural;
+    return `${value} ${value === 1 ? singular : plural}`;
 }
