@@ -44,8 +44,8 @@ export class SoundBoardPlayCommand extends Command {
         const sound = new MessageMedia(soundBoardState[soundKey].mimetype || 'audio/mpeg', soundBoardState[soundKey].data);
         console.log(`Playing sound ${soundKey}`);
         await (referencedMessage || msg).reply("", chat.id._serialized, { media: sound });
-        soundBoardState[soundKey].reproductionCount++;
-        this.stateSaver.save('soundboard', soundBoardState);
+        soundBoardState[soundKey].reproductionCount? soundBoardState[soundKey].reproductionCount = 1 : soundBoardState[soundKey].reproductionCount++;
+        await this.stateSaver.save('soundboard', soundBoardState);
         console.log(`Sound ${soundKey} sent`);
     }
 
