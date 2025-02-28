@@ -21,7 +21,8 @@ export class SoundBoardAddCommand extends Command {
     async handle(_client: Client, _chat: Chat, msg: Message, ...argsArray: string[]): Promise<void> {
         const contactId = await extractContactId(msg);
 
-        const [soundKey] = argsArray;
+        const [soundKey, ...theRest] = argsArray;
+        const description = theRest.join(" ");
 
         if(!soundKey) {
             await msg.reply("Você precisa informar uma chave para adicionar um som!", contactId);
@@ -57,7 +58,9 @@ export class SoundBoardAddCommand extends Command {
             data: media.data,
             mimetype: media.mimetype,
             addedBy: contactId,
-            addedAt: Date.now()
+            addedAt: Date.now(),
+            reproductionCount: 0,
+            description
         }
 
         await this.stateSaver.save('soundboard', soundBoardState);
