@@ -9,7 +9,7 @@ export function formatString(str: string, ...args: string[]) {
 }
 
 export function pluralize(value: number, singular: string, plural: string, zeroValue: string) {
-    if(value === 0) {
+    if(!value || value === 0) {
         return `${zeroValue} ${singular}`;
     }
     return `${value} ${value === 1 ? singular : plural}`;
