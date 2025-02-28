@@ -40,6 +40,7 @@ export class SoundBoardAddCommand extends Command {
 
         if(!hasReferencedMediaMessage || !isMediaValid) {
             await (referencedMessage || msg).reply("Você precisa usar o comando respondendo uma mensagem de áudio!", contactId);
+            await msg.react('👎');
             return;
         }
 
@@ -51,6 +52,7 @@ export class SoundBoardAddCommand extends Command {
         const alreadExists = !!soundBoardState[soundKey];
         if(alreadExists) {
             await referencedMessage.reply(`Já existe um som com a chave '${bold(soundKey)}' no soundboard!`, contactId);
+            await msg.react('👎');
             return;
         }
 
