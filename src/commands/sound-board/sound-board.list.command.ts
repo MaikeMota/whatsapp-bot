@@ -53,12 +53,13 @@ export class SoundBoardListCommand extends Command {
 
     private getSortFunction(sortBy: string, extraOptions: ExtraOptions){
         switch(sortBy) {
-            case SORT_BY_VALUES.ADDED_AT:
-                return (a: [string, Sound], b: [string, Sound]) => a[1].addedAt - b[1].addedAt;
             case SORT_BY_VALUES.REPRODUCTION_COUNT:
                 return (a: [string, Sound], b: [string, Sound]) => a[1].reproductionCount - b[1].reproductionCount;
             case SORT_BY_VALUES.ADDED_BY:
                 return (a: [string, Sound], b: [string, Sound]) => a[1].addedBy.localeCompare(b[1].addedBy);
+            case SORT_BY_VALUES.ADDED_AT:
+            default:
+                return (a: [string, Sound], b: [string, Sound]) => a[1].addedAt - b[1].addedAt;
         }
     }
 
