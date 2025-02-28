@@ -15,7 +15,7 @@ const SORT_BY_VALUES = {
 
 type SORT_BY = typeof SORT_BY_VALUES[keyof typeof SORT_BY_VALUES];
 
-export class SoundBoardPlayCommand extends Command {
+export class SoundBoardListCommand extends Command {
 
     command: string = "list";
     alternativeCommands = ["l"];
