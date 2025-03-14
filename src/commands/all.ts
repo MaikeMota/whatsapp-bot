@@ -160,23 +160,18 @@ export class MentionAllCommand extends Command {
             console.log(`Usuário ${contactId} tentou usar o comando @all geral no grupo ${chat.name} porem não é um administrador.`);
             return;
         }
-        const quotedMsg = await msg.getQuotedMessage();
-
-        let text = "☝️";
+        
         let mentions = [];
         for (let participant of usersToMention) {
             mentions.push(participant.id);
-            if(!quotedMsg){ 
-                text += ` @${participant.user}`;
-            }
         }
 
         this.setLastUsage(key, now);
 
-        const messageToReply = quotedMsg || msg
+        const messageToReply = await msg.getQuotedMessage() || msg;
 
         await msg.react('👍');
-        await messageToReply.reply(!!quotedMsg? "☝️" : text, chat.id._serialized, { mentions });
+        await messageToReply.reply("☝️", chat.id._serialized, { mentions });
 
     }
 
