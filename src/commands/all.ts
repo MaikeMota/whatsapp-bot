@@ -15,7 +15,7 @@ interface AllMentionGroup {
 
 export class MentionAllCommand extends Command {
     command = '@all';
-    alternativeCommands = ['@todos']
+    alternativeCommands = ['@todos', "/all", "/todos"]
 
     stateSaver = new JSONStateSaver<AllMentionGroup>();
 
@@ -160,20 +160,23 @@ export class MentionAllCommand extends Command {
             console.log(`Usuário ${contactId} tentou usar o comando @all geral no grupo ${chat.name} porem não é um administrador.`);
             return;
         }
+        const quotedMsg = await msg.getQuotedMessage();
 
-        let text = "";
+        let text = "☝️";
         let mentions = [];
         for (let participant of usersToMention) {
             mentions.push(participant.id);
-            text += ` @${participant.user}`;
+            if(!quotedMsg){ 
+                text += ` @${participant.user}`;
+            }
         }
 
         this.setLastUsage(key, now);
 
-        const messageToReply = await msg.getQuotedMessage() || msg
+        const messageToReply = quotedMsg || msg
 
         await msg.react('👍');
-        await messageToReply.reply(text, chat.id._serialized, { mentions });
+        await messageToReply.reply(!!quotedMsg? "☝️" : text, chat.id._serialized, { mentions });
 
     }
 
@@ -185,7 +188,7 @@ export class MentionAllCommand extends Command {
         const lastUse = lastUses[key];
         return lastUse && (now - lastUse) < INTERVAL_BETWEEN_USES;
     }
-    
+
     private async getGroup(chatId, groupName) {
         let allRegisteredGroups = await this.stateSaver.load('all_groups');
         if (!allRegisteredGroups) {
