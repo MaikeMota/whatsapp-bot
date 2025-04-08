@@ -31,6 +31,7 @@ services:
       - EMMA_TRACKER_CHAT_IDS=${EMMA_TRACKER_CHAT_IDS}
       - GEMINI_KEY=${GEMINI_KEY}
       - GEMINI_RESUMO_PROMPT=${GEMINI_RESUMO_PROMPT}
+      - GEMINI_YOUTUBE_URL_REGEX=${GEMINI_YOUTUBE_URL_REGEX}
     volumes:
       - type: bind
         source: ${AUTH_FOLDER}

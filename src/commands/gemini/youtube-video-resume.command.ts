@@ -2,8 +2,9 @@ import { Client, GroupChat, Message } from "whatsapp-web.js";
 import { Command } from "../command";
 
 
-const YOUTUBE_URL_REGEX = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-const { GEMINI_KEY, GEMINI_RESUMO_PROMPT } = process.env;
+const { GEMINI_KEY, GEMINI_RESUMO_PROMPT, GEMINI_YOUTUBE_URL_REGEX } = process.env;
+
+const YOUTUBE_URL_REGEX = new RegExp(GEMINI_YOUTUBE_URL_REGEX);
 
 export class YoutubeVideoResumeCommand extends Command {
     command = '/resumo';
