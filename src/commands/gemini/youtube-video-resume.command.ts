@@ -3,7 +3,7 @@ import { Command } from "../command";
 
 
 const YOUTUBE_URL_REGEX = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-const GEMINI_KEY = process.env.GEMINI_KEY;
+const { GEMINI_KEY, GEMINI_RESUMO_PROMPT } = process.env;
 
 export class YoutubeVideoResumeCommand extends Command {
     command = '/resumo';
@@ -37,7 +37,7 @@ export class YoutubeVideoResumeCommand extends Command {
                 {
                     "parts": [
                         {
-                            "text": "Faça um sumário dos principais pontos abordados neste vídeo, de forma estruturada e concisa. Se possivel, adicionar o timestamp do vídeo com o link para o instante do vídeo onde a fala acontece.  não inclua nada na resposta além do própiro resumo do vídeo formatado para o whatsapp. "
+                            "text": GEMINI_RESUMO_PROMPT
                         },
                         {
                             "file_data": {

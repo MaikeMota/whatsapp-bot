@@ -30,6 +30,7 @@ services:
       - EMMA_TRACKING_CODE=${EMMA_TRACKING_CODE}
       - EMMA_TRACKER_CHAT_IDS=${EMMA_TRACKER_CHAT_IDS}
       - GEMINI_KEY=${GEMINI_KEY}
+      - GEMINI_RESUMO_PROMPT=${GEMINI_RESUMO_PROMPT}
     volumes:
       - type: bind
         source: ${AUTH_FOLDER}
