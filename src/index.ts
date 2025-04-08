@@ -57,6 +57,7 @@ import { GroupAdminUnlockerRunner } from './runners/group-admin/unlocker.runner'
 import { Runner } from './runners/interfaces/runner.interface';
 
 //import { EmmaTrackerRunner } from './runners/emma-tracker/emma-tracker.runner';
+import { YoutubeVideoResumeCommand } from './commands/gemini/youtube-video-resume.command';
 import { SoundBoardCommand } from './commands/sound-board/sound-board.command';
 import { randomIntFromInterval } from './utils/util';
 import { isId } from './utils/whatsapp.util';
@@ -143,7 +144,8 @@ const handlers: Constructor<Command>[] = [
     PiadaCommand,
     HojeTemCommand,
     GoblinCommand,
-    SoundBoardCommand
+    SoundBoardCommand,
+    YoutubeVideoResumeCommand
 ];
 
 const runners: Constructor<Runner>[] = [
