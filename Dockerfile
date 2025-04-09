@@ -1,4 +1,4 @@
-FROM node:18.18.2 AS builder
+FROM node:18.20.8 AS builder
 
 RUN apt update
 RUN apt upgrade -y
