@@ -32,5 +32,6 @@ const CLASSICAS_DANI = [
     "😂😂😂😂",
     "Vou pro bunker",
     "Cof Cof Cof",
-    "*leve palma com atrito entre as maos*"
+    "*leve palma com atrito entre as maos*",
+    "O computador só sabe que foi desligado porque ele é religado de novo."
 ]
