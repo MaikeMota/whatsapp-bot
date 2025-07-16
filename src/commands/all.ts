@@ -128,7 +128,7 @@ export class MentionAllCommand extends Command {
             }
         }
 
-        const key = `${chat.id}-${msg.author}`
+        const key = `${chat.id}-${msg.author}`;
         const now = Date.now();
 
         if (!msg.fromMe && this.hadUsedRecently(key, now)) {
@@ -181,7 +181,12 @@ export class MentionAllCommand extends Command {
 
     private hadUsedRecently(key: string, now: number) {
         const lastUse = lastUses[key];
-        return lastUse && (now - lastUse) < INTERVAL_BETWEEN_USES;
+        if(!lastUse){ 
+            return false
+        }
+        const usageDiff = now - lastUse
+        console.log(`[@all] key: ${key}, lastUse: ${lastUse}, now: ${now}, usageDiff: ${usageDiff}`);
+        return usageDiff < INTERVAL_BETWEEN_USES;
     }
 
     private async getGroup(chatId, groupName) {
