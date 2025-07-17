@@ -31,6 +31,8 @@ export class MentionAllCommand extends Command {
 
         const [maybeSubcommand, ...subCommandArgs] = argsArray;
 
+        let groupName = 'default';
+
         if (maybeSubcommand) {
             const [groupName, adtionalCommand, ...adtionalArgs] = subCommandArgs;
             let group = await this.getGroup(chat.id._serialized, groupName);
@@ -128,21 +130,12 @@ export class MentionAllCommand extends Command {
             }
         }
 
-        const key = `${chat.id}-${msg.author}`;
-        const now = Date.now();
-
-        if (!msg.fromMe && this.hadUsedRecently(key, now)) {
-            await msg.react('👎');
-            await msg.reply("Você não pode marcar todo mundo com tanta frequência!", contactId);
-            return;
-        }
-
         let usersToMention = chat.participants.map(p => { return { user: p.id.user, id: p.id._serialized } });
 
         let usingNamedList = false;
         // at this point maybeSubcommand could be a group name
         if (maybeSubcommand) {
-            const groupName = maybeSubcommand;
+            groupName = maybeSubcommand;
             const group = await this.getGroup(chat.id._serialized, groupName);
             if (group.length === 0) {
                 await msg.react('👎');
@@ -153,6 +146,8 @@ export class MentionAllCommand extends Command {
             usingNamedList = true;
         }
 
+        const key = `${chat.id._serialized}-${msg.author}-${groupName}`;
+        const now = Date.now();
 
         if (!usingNamedList && !msg.fromMe && !isFromGroupAdmin) {
             await msg.react('👎');
@@ -160,7 +155,13 @@ export class MentionAllCommand extends Command {
             console.log(`Usuário ${contactId} tentou usar o comando @all geral no grupo ${chat.name} porem não é um administrador.`);
             return;
         }
-        
+
+        if (!msg.fromMe && this.hadUsedRecently(key, now)) {
+            await msg.react('👎');
+            await msg.reply("Você não pode marcar todo mundo com tanta frequência!", contactId);
+            return;
+        }
+
         let mentions = [];
         for (let participant of usersToMention) {
             mentions.push(participant.id);
