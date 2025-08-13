@@ -16,7 +16,7 @@
   "dependencies": {
     "@deepgram/sdk": "^1.21.0",
     "brazilian-values": "^0.13.0",
-    "cheerio": "^1.0.0",
+    "cheerio": "^1.1.2",
     "dotenv": "^16.3.1",
     "lerolero": "^0.1.0",
     "luxon": "^3.4.4",
