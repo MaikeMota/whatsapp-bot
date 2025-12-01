@@ -17,7 +17,7 @@
     "@deepgram/sdk": "^1.21.0",
     "brazilian-values": "^0.13.0",
     "cheerio": "^1.0.0",
-    "dotenv": "^16.3.1",
+    "dotenv": "^16.5.0",
     "lerolero": "^0.1.0",
     "luxon": "^3.4.4",
     "qrcode-terminal": "^0.12.0",
